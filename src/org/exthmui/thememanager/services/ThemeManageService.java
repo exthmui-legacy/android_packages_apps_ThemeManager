@@ -16,13 +16,10 @@
 
 package org.exthmui.thememanager.services;
 
-import android.app.PendingIntent;
 import android.app.Service;
 import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.IntentSender;
 import android.content.om.IOverlayManager;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
@@ -44,11 +41,11 @@ import android.support.v4.content.LocalBroadcastManager;
 import org.exthmui.thememanager.broadcasts.ThemeStatusReceiver;
 import org.exthmui.thememanager.models.OverlayTarget;
 import org.exthmui.thememanager.models.Theme;
+import org.exthmui.thememanager.utils.PackageUtil;
 import org.exthmui.thememanager.utils.SoundUtil;
 import org.exthmui.thememanager.utils.WallpaperUtil;
 
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -280,7 +277,7 @@ public class ThemeManageService extends Service {
 
                 // uninstall
                 if (uninstallFlag) {
-                    mPackageInstaller.uninstall(ai.packageName, createIntentSender(this,1, "uninstall_overlay"));
+                    PackageUtil.uninstallPackage(this, ai.packageName, null);
                 }
             }
         }
@@ -292,6 +289,7 @@ public class ThemeManageService extends Service {
         Theme theme = serviceGetThemeInfo(bundle.getString("package"), false);
         ArrayList<String> whiteList = bundle.getStringArrayList("whitelist");
 
+        final int userId = UserHandle.myUserId();
         boolean ret = true;
 
         try {
@@ -347,14 +345,53 @@ public class ThemeManageService extends Service {
                 // install & enable
                 InputStream is = themeAssetManager.open("overlays/" + ovt.getPackageName());
 
-                if (!installOverlayPackage(is)) {
-                    Bundle removeBundle = new Bundle();
-                    removeBundle.putStringArrayList("whitelist", whiteList);
-                    removeBundle.putBoolean("uninstall", true);
+                AtomicBoolean installResult = new AtomicBoolean();
+                installResult.set(false);
 
-                    serviceRemoveThemeOverlays(removeBundle);
-                    ret = false;
-                    break;
+                synchronized (installResult) {
+                    PackageUtil.installPackage(this, is, new PackageUtil.PackageInstallerStatusListener() {
+                        @Override
+                        public void onSuccessListener(String packageName) {
+                            // check installed package for security reasons
+                            if (!packageName.startsWith(OverlayPackageHeader) || !serviceIsOverlayPackage(packageName)) {
+                                Log.w(TAG, "Package " + packageName + " is not a verified overlay package!");
+                                onFailureListener(packageName, 0);
+                                return;
+                            }
+                            try {
+                                mOverlayService.setEnabled(packageName, true, userId);
+                            } catch (RemoteException e) {
+                                Log.e(TAG, "Failed to enable overlay " + packageName);
+                                onFailureListener(packageName, 0);
+                                return;
+                            }
+                            synchronized (installResult) {
+                                installResult.set(true);
+                                installResult.notify();
+                            }
+                        }
+
+                        @Override
+                        public void onFailureListener(String packageName, int code) {
+                            Bundle removeBundle = new Bundle();
+                            removeBundle.putStringArrayList("whitelist", whiteList);
+                            removeBundle.putBoolean("uninstall", true);
+
+                            serviceRemoveThemeOverlays(removeBundle);
+
+                            synchronized (installResult) {
+                                installResult.set(false);
+                                installResult.notify();
+                            }
+                        }
+                    });
+
+                    installResult.wait();
+
+                    if (!installResult.get()) {
+                        ret = false;
+                        break;
+                    }
                 }
                 nowApplied++;
             }
@@ -411,84 +448,6 @@ public class ThemeManageService extends Service {
         }
 
         return overlayTargets;
-    }
-
-    private boolean installOverlayPackage(InputStream inputStream) {
-
-        final AtomicBoolean finishFlag = new AtomicBoolean();
-        final int userId = UserHandle.myUserId();
-
-        String installId = "overlay_install_"+System.currentTimeMillis();
-        PackageInstaller packageInstaller = this.getPackageManager().getPackageInstaller();
-
-        this.registerReceiver(new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                context.unregisterReceiver(this);
-                int statusCode = intent.getIntExtra(PackageInstaller.EXTRA_STATUS, PackageInstaller.STATUS_FAILURE);
-
-                String overlayPackageName = intent.getStringExtra(PackageInstaller.EXTRA_PACKAGE_NAME);
-
-                boolean successFlag = PackageInstaller.STATUS_SUCCESS == statusCode;
-
-                // check installed package for security reasons
-                if (successFlag &&
-                        (!overlayPackageName.startsWith(OverlayPackageHeader) || !serviceIsOverlayPackage(overlayPackageName))) {
-                    Log.w(TAG, "Package " + overlayPackageName + " is not a verified overlay package!");
-                    successFlag = false;
-                }
-
-                // enable overlay
-                if (successFlag) {
-                    try {
-                        mOverlayService.setEnabled(overlayPackageName, true, userId);
-                    } catch (RemoteException e) {
-                        Log.e(TAG, "Failed to enable overlay " + overlayPackageName);
-                        successFlag = false;
-                    }
-                }
-
-                synchronized (finishFlag) {
-                    finishFlag.set(successFlag);
-                    finishFlag.notify();
-                }
-            }
-        }, new IntentFilter(installId));
-
-        PackageInstaller.SessionParams sessionParams = new PackageInstaller.SessionParams(
-                PackageInstaller.SessionParams.MODE_FULL_INSTALL);
-
-        // install
-        try {
-            // set params
-            int sessionId = packageInstaller.createSession(sessionParams);
-            PackageInstaller.Session session = packageInstaller.openSession(sessionId);
-            OutputStream outputStream = session.openWrite(installId, 0, -1);
-
-            byte[] buffer = new byte[65536];
-            int tmpByte = -1;
-
-            while ((tmpByte = inputStream.read(buffer)) != -1) {
-                outputStream.write(buffer, 0, tmpByte);
-            }
-
-            session.fsync(outputStream);
-            outputStream.close();
-
-            synchronized (finishFlag) {
-                session.commit(createIntentSender(this, sessionId, installId));
-                finishFlag.wait();
-                return finishFlag.get();
-            }
-        } catch (Exception e) {
-            Log.e(TAG, "Failed to install overlay package", e);
-            return false;
-        }
-    }
-
-    private static IntentSender createIntentSender(Context context, int sessionId, String name) {
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(context, sessionId, new Intent(name), 0);
-        return pendingIntent.getIntentSender();
     }
 
     private static Intent getBroadcastIntent(String action, Theme theme) {

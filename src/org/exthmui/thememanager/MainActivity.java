@@ -44,6 +44,7 @@ import org.exthmui.thememanager.models.Theme;
 import org.exthmui.thememanager.services.ThemeDataService;
 import org.exthmui.thememanager.services.ThemeManageService;
 import org.exthmui.thememanager.utils.NotificationUtil;
+import org.exthmui.thememanager.utils.PackageUtil;
 import org.exthmui.thememanager.utils.PermissionUtil;
 
 import java.util.ArrayList;
@@ -124,35 +125,23 @@ public class MainActivity extends Activity {
                 .setPositiveButton(android.R.string.ok, (dialogInterface, i) -> {
                     dialogInterface.dismiss();
                     // do uninstall
-                    String uninstallId = "uninstall_" + theme.getPackageName();
-                    setReceiver(uninstallId, index);
-                    getPackageManager().getPackageInstaller().uninstall(theme.getPackageName(), createIntentSender(this, uninstallId));
+                    PackageUtil.uninstallPackage(this, theme.getPackageName(), new PackageUtil.PackageInstallerStatusListener() {
+                        @Override
+                        public void onSuccessListener(String packageName) {
+                            mThemeDataBinder.removeItemOnList(index);
+                        }
+
+                        @Override
+                        public void onFailureListener(String packageName, int code) {
+
+                        }
+                    });
 
                 })
                 .setNegativeButton(android.R.string.cancel,  (dialogInterface, i) -> {
                     dialogInterface.dismiss();
                 })
                 .show();
-    }
-
-    private void setReceiver(String receiverId, final int index) {
-        registerReceiver(new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                context.unregisterReceiver(this);
-                int statusCode = intent.getIntExtra(PackageInstaller.EXTRA_STATUS, PackageInstaller.STATUS_FAILURE);
-
-                boolean successFlag = PackageInstaller.STATUS_SUCCESS == statusCode;
-                if (successFlag) {
-                    mThemeDataBinder.removeItemOnList(index);
-                }
-            }
-        }, new IntentFilter(receiverId));
-    }
-
-    private static IntentSender createIntentSender(Context context, String name) {
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 0, new Intent(name), 0);
-        return pendingIntent.getIntentSender();
     }
 
     @Override
