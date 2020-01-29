@@ -137,7 +137,7 @@ public abstract class CommonAdapter<T> extends BaseAdapter {
         public <T extends View> T getView(int id) {
             T t = (T) mViews.get(id);
             if (t == null) {
-                t = (T) item.findViewById(id);
+                t = item.findViewById(id);
                 mViews.put(id, t);
             }
             return t;

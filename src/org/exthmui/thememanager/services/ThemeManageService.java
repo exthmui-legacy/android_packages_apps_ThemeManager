@@ -133,7 +133,7 @@ public class ThemeManageService extends Service {
     private boolean isThemePackage(String packageName) {
         boolean ret = false;
         try {
-            ApplicationInfo ai = mPackageManager.getApplicationInfo(packageName, mPackageManager.GET_META_DATA);
+            ApplicationInfo ai = mPackageManager.getApplicationInfo(packageName, PackageManager.GET_META_DATA);
             Bundle metadata = ai.metaData;
             if (metadata != null) {
                 ret = metadata.getBoolean("exthmui_theme",false);
@@ -192,7 +192,7 @@ public class ThemeManageService extends Service {
 
     private Theme serviceGetThemeInfo(String packageName, boolean getImage) {
         try {
-            ApplicationInfo ai = mPackageManager.getApplicationInfo(packageName, mPackageManager.GET_META_DATA);
+            ApplicationInfo ai = mPackageManager.getApplicationInfo(packageName, PackageManager.GET_META_DATA);
             Resources resources = mPackageManager.getResourcesForApplication(packageName);
             Theme theme = new Theme(packageName);
             AssetManager assetManager = resources.getAssets();
