@@ -424,7 +424,8 @@ public class ThemeManageService extends Service {
         boolean ret = false;
         try {
             PackageInfo pi = mPackageManager.getPackageInfo(packageName, 0);
-            ret =  pi.isStaticOverlayPackage();
+            ApplicationInfo ai = pi.applicationInfo;
+            ret =  pi.isOverlayPackage() && ((ai.flags & ApplicationInfo.FLAG_HAS_CODE) == 0);
         } catch (Exception e) {
             Log.e(TAG, "check package " + packageName + " failed");
         }
