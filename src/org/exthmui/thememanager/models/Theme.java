@@ -31,11 +31,8 @@ public class Theme {
     private String mLockScreen;
 
     private String mAlarmSound;
-    private String mAlarmName;
     private String mNotificationSound;
-    private String mNotificationName;
     private String mRingtone;
-    private String mRingtoneName;
 
     private List<OverlayTarget> mOverlayTargets;
 
@@ -57,19 +54,16 @@ public class Theme {
         mIsSystemPackage = val;
     }
 
-    public void setAlarmSound(String file, String name) {
-        mAlarmSound = file;
-        mAlarmName = name;
+    public void setAlarmSound(String alarmSound) {
+        mAlarmSound = alarmSound;
     }
 
-    public void setNotificationSound(String file, String name) {
-        mNotificationSound = file;
-        mNotificationName = name;
+    public void setNotificationSound(String notificationSound) {
+        mNotificationSound = notificationSound;
     }
 
-    public void setRingtone(String file, String name) {
-        mRingtone = file;
-        mRingtoneName = name;
+    public void setRingtone(String ringtone) {
+        mRingtone = ringtone;
     }
 
     public void setLockScreen(String lockScreen) {
@@ -146,18 +140,6 @@ public class Theme {
 
     public String getAlarmSound() {
         return mAlarmSound;
-    }
-
-    public String getAlarmName() {
-        return "".equals(mAlarmName) ? getAlarmSound() : mAlarmName;
-    }
-
-    public String getNotificationName() {
-        return "".equals(mNotificationName) ? getNotificationSound() : mNotificationName;
-    }
-
-    public String getRingtoneName() {
-        return "".equals(mRingtoneName) ? getRingtone() : mRingtoneName;
     }
 
     public String getNotificationSound() {

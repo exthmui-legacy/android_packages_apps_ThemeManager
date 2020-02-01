@@ -210,21 +210,12 @@ public class ThemeManageService extends Service {
             }
 
             // get sounds
-            int soundResId = resources.getIdentifier("alarm", "array", packageName);
-            if (soundResId != 0) {
-                String[] soundArray = resources.getStringArray(soundResId);
-                theme.setAlarmSound(soundArray[0], soundArray[1]);
-            }
-            soundResId = resources.getIdentifier("ringtone", "array", packageName);
-            if (soundResId != 0) {
-                String[] soundArray = resources.getStringArray(soundResId);
-                theme.setRingtone(soundArray[0], soundArray[1]);
-            }
-            soundResId = resources.getIdentifier("notification", "array", packageName);
-            if (soundResId != 0) {
-                String[] soundArray = resources.getStringArray(soundResId);
-                theme.setRingtone(soundArray[0], soundArray[1]);
-            }
+            int alarmSoundResId = resources.getIdentifier("alarm", "string", packageName);
+            if (alarmSoundResId != 0) theme.setAlarmSound(resources.getString(alarmSoundResId));
+            int ringtoneResId = resources.getIdentifier("ringtone", "string", packageName);
+            if (ringtoneResId != 0) theme.setRingtone(resources.getString(ringtoneResId));
+            int notificationSoundResId = resources.getIdentifier("notification", "string", packageName);
+            if (notificationSoundResId != 0) theme.setNotificationSound(resources.getString(notificationSoundResId));
 
             // get wallpaper
             int wallpaperResId = resources.getIdentifier("wallpaper", "string", packageName);
@@ -310,31 +301,31 @@ public class ThemeManageService extends Service {
 
             if (theme.hasRingtone() && bundle.getBoolean("ringtone")) {
                 mLocalBroadcastManager.sendBroadcast(getBroadcastIntent(BROADCAST_ACTION_APPLYING_RINGTONE, theme));
-                InputStream is = themeAssetManager.open("sounds/" + theme.getRingtone());
-                SoundUtil.setRingtone(this, theme.getRingtoneName(), is, SoundUtil.TYPE_RINGTONE);
+                InputStream is = themeAssetManager.open("ringtone/" + theme.getRingtone());
+                SoundUtil.setRingtone(this, theme.getRingtone(), is, SoundUtil.TYPE_RINGTONE);
             }
 
             if (theme.hasAlarmSound() && bundle.getBoolean("alarm")) {
                 mLocalBroadcastManager.sendBroadcast(getBroadcastIntent(BROADCAST_ACTION_APPLYING_ALARM, theme));
-                InputStream is = themeAssetManager.open("sounds/" + theme.getAlarmSound());
-                SoundUtil.setRingtone(this, theme.getAlarmName(), is, SoundUtil.TYPE_ALARM);
+                InputStream is = themeAssetManager.open("ringtone/" + theme.getAlarmSound());
+                SoundUtil.setRingtone(this, theme.getRingtone(), is, SoundUtil.TYPE_ALARM);
             }
 
             if (theme.hasNotificationSound() && bundle.getBoolean("notification")) {
                 mLocalBroadcastManager.sendBroadcast(getBroadcastIntent(BROADCAST_ACTION_APPLYING_NOTIFICATION, theme));
-                InputStream is = themeAssetManager.open("sounds/" + theme.getNotificationSound());
-                SoundUtil.setRingtone(this, theme.getNotificationName(), is, SoundUtil.TYPE_NOTIFICATION);
+                InputStream is = themeAssetManager.open("ringtone/" + theme.getNotificationSound());
+                SoundUtil.setRingtone(this, theme.getRingtone(), is, SoundUtil.TYPE_NOTIFICATION);
             }
 
             if (theme.hasWallpaper() && bundle.getBoolean("wallpaper")) {
                 mLocalBroadcastManager.sendBroadcast(getBroadcastIntent(BROADCAST_ACTION_APPLYING_WALLPAPER, theme));
-                InputStream is = themeAssetManager.open("backgrounds/" + theme.getWallpaper());
+                InputStream is = themeAssetManager.open("wallpaper/" + theme.getWallpaper());
                 WallpaperUtil.setWallpaper(this, is);
             }
 
             if (theme.hasLockScreen() && bundle.getBoolean("lockscreen")) {
                 mLocalBroadcastManager.sendBroadcast(getBroadcastIntent(BROADCAST_ACTION_APPLYING_LOCKSCREEN, theme));
-                InputStream is = themeAssetManager.open("backgrounds/" + theme.getLockScreen());
+                InputStream is = themeAssetManager.open("wallpaper/" + theme.getLockScreen());
                 WallpaperUtil.setLockScreen(this, is);
             }
 
