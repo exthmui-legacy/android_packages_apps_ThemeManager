@@ -32,7 +32,7 @@ public class SoundUtil {
     public final static int TYPE_NOTIFICATION = RingtoneManager.TYPE_NOTIFICATION;
     public final static int TYPE_RINGTONE = RingtoneManager.TYPE_RINGTONE;
 
-    public static void setSound(Context context, File file, int type, boolean delete) {
+    public static void setSound(Context context, File file, int type) {
 
         ContentValues values = new ContentValues();
         values.put(MediaStore.MediaColumns.DATA, file.getAbsolutePath());
@@ -61,8 +61,6 @@ public class SoundUtil {
         Uri newUri = context.getContentResolver().insert(uri, values);
 
         RingtoneManager.setActualDefaultRingtoneUri(context, type, newUri);
-
-        if (delete) file.delete();
     }
 
     public static void setRingtone(Context context, String name, InputStream inputStream, int type) throws IOException {
@@ -70,7 +68,7 @@ public class SoundUtil {
 
         FileUtil.createPath(ringtonePath);
         FileUtil.saveInputStream(ringtonePath, inputStream);
-        SoundUtil.setSound(context, new File(ringtonePath) , type, true);
+        SoundUtil.setSound(context, new File(ringtonePath) , type);
     }
 
     public static String getRingtonePath(Context context, String ringtoneName) {
