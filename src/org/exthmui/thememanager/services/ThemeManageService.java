@@ -27,6 +27,7 @@ import android.content.pm.PackageInstaller;
 import android.content.pm.PackageManager;
 import android.content.res.AssetManager;
 import android.content.res.Resources;
+import android.content.res.XmlResourceParser;
 import android.graphics.drawable.Drawable;
 import android.os.Binder;
 import android.os.Bundle;
@@ -34,6 +35,7 @@ import android.os.IBinder;
 import android.os.RemoteException;
 import android.os.ServiceManager;
 import android.os.UserHandle;
+import android.util.DisplayMetrics;
 import android.util.Log;
 
 import android.support.v4.content.LocalBroadcastManager;
@@ -47,7 +49,10 @@ import org.exthmui.thememanager.utils.WallpaperUtil;
 
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Stack;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class ThemeManageService extends Service {
@@ -192,36 +197,90 @@ public class ThemeManageService extends Service {
 
     private Theme serviceGetThemeInfo(String packageName, boolean getImage) {
         try {
+            DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
             ApplicationInfo ai = mPackageManager.getApplicationInfo(packageName, PackageManager.GET_META_DATA);
             Resources resources = mPackageManager.getResourcesForApplication(packageName);
             Theme theme = new Theme(packageName);
-            AssetManager assetManager = resources.getAssets();
 
+            Stack<String> xmlTags = new Stack<>();
+            Map<String, Integer> attrMap = new HashMap<>();
+            List<OverlayTarget> overlayTargetList = new ArrayList<>();
+            int themeInfoXmlResId = resources.getIdentifier("theme_info", "xml", packageName);
+            XmlResourceParser themeInfoXml = resources.getXml(themeInfoXmlResId);
+            int eventType = themeInfoXml.getEventType();
 
-            theme.setName(ai.loadLabel(mPackageManager).toString());
-            theme.setAuthor(ai.metaData.getString("theme_author","author"));
+            while (eventType != XmlResourceParser.END_DOCUMENT) {
+                switch (eventType) {
+                    case XmlResourceParser.START_TAG:
+                        xmlTags.push(themeInfoXml.getName().toLowerCase());
+                        switch (xmlTags.peek()) {
+                            case "overlay":
+                                overlayTargetList.clear();
+                                break;
+                            case "wallpaper": case "lockscreen":
+                                attrMap.clear();
+                                for (int i = 0; i < themeInfoXml.getAttributeCount(); i++) {
+                                    attrMap.put(themeInfoXml.getAttributeName(i), themeInfoXml.getAttributeIntValue(i, -1));
+                                }
+                                break;
+                        }
+                        break;
+                    case XmlResourceParser.TEXT:
+                        switch (xmlTags.peek()) {
+                            // basic info
+                            case "name":
+                                theme.setName(themeInfoXml.getText());
+                                break;
+                            case "author":
+                                theme.setAuthor(themeInfoXml.getText());
+                                break;
+
+                            // sounds
+                            case "ringtone":
+                                theme.setRingtone(themeInfoXml.getText());
+                                break;
+                            case "alarm":
+                                theme.setAlarmSound(themeInfoXml.getText());
+                                break;
+                            case "notification":
+                                theme.setNotificationSound(themeInfoXml.getText());
+                                break;
+
+                            // background
+                            case "wallpaper":
+                                if ((attrMap.isEmpty() && !theme.hasWallpaper()) ||
+                                        (displayMetrics.widthPixels / attrMap.getOrDefault("ratioX", 1) == attrMap.getOrDefault("ratioY", 1))) {
+                                    theme.setWallpaper(themeInfoXml.getText());
+                                }
+                                break;
+                            case "lockscreen":
+                                if ((attrMap.isEmpty() && !theme.hasLockScreen()) ||
+                                        (displayMetrics.widthPixels / attrMap.getOrDefault("ratioX", 1) == attrMap.getOrDefault("ratioY", 1))) {
+                                    theme.setLockScreen(themeInfoXml.getText());
+                                }
+                                break;
+
+                            // overlay
+                            case "target":
+                                OverlayTarget ovt = getOverlayTarget(themeInfoXml.getText());
+                                if (ovt != null) overlayTargetList.add(ovt);
+                                break;
+                        }
+                        break;
+                    case XmlResourceParser.END_TAG:
+                        xmlTags.pop();
+                }
+                eventType = themeInfoXml.next();
+            }
+
+            theme.setOverlayTargets(overlayTargetList);
+
             theme.setIsSystemPackage((ai.flags & ApplicationInfo.FLAG_SYSTEM) != 0);
-
-            theme.setOverlayTargets(getOverlayTargets(packageName));
 
             if (getImage) {
                 int imageResId = resources.getIdentifier("image", "drawable", packageName);
                 theme.setThemeImage(resources.getDrawable(imageResId, null));
             }
-
-            // get sounds
-            int alarmSoundResId = resources.getIdentifier("alarm", "string", packageName);
-            if (alarmSoundResId != 0) theme.setAlarmSound(resources.getString(alarmSoundResId));
-            int ringtoneResId = resources.getIdentifier("ringtone", "string", packageName);
-            if (ringtoneResId != 0) theme.setRingtone(resources.getString(ringtoneResId));
-            int notificationSoundResId = resources.getIdentifier("notification", "string", packageName);
-            if (notificationSoundResId != 0) theme.setNotificationSound(resources.getString(notificationSoundResId));
-
-            // get wallpaper
-            int wallpaperResId = resources.getIdentifier("wallpaper", "string", packageName);
-            if (wallpaperResId != 0) theme.setWallpaper(resources.getString(wallpaperResId));
-            int lockscreenResId = resources.getIdentifier("lockscreen", "string", packageName);
-            if (lockscreenResId != 0) theme.setLockScreen(resources.getString(lockscreenResId));
 
             return theme;
         } catch (Exception e) {
@@ -342,7 +401,7 @@ public class ThemeManageService extends Service {
                 mLocalBroadcastManager.sendBroadcast(tIntent);
 
                 // install & enable
-                InputStream is = themeAssetManager.open("overlays/" + ovt.getPackageName());
+                InputStream is = themeAssetManager.open("overlay/" + ovt.getPackageName());
 
                 AtomicBoolean installResult = new AtomicBoolean();
                 installResult.set(false);
@@ -422,32 +481,18 @@ public class ThemeManageService extends Service {
         return ret;
     }
 
-    // 获取主题支持的目标
-    private List<OverlayTarget> getOverlayTargets(String packageName) {
-
-        List<OverlayTarget> overlayTargets = new ArrayList<>();
-
+    // 获取叠加层目标的信息
+    private OverlayTarget getOverlayTarget(String packageName) {
         try {
-            Resources resources = mPackageManager.getResourcesForApplication(packageName);
-            int arrayResId = resources.getIdentifier("targets", "array", packageName);
-            String[] overlayTargetArray = resources.getStringArray(arrayResId);
+            ApplicationInfo ai = mPackageManager.getApplicationInfo(packageName, 0);
 
-            for (String targetName : overlayTargetArray) {
-                try {
-                    ApplicationInfo tmpAI = mPackageManager.getApplicationInfo(targetName, 0);
-
-                    OverlayTarget overlayTarget = new OverlayTarget(targetName);
-                    overlayTarget.setLabel(tmpAI.loadLabel(mPackageManager).toString());
-                    overlayTargets.add(overlayTarget);
-                } catch (PackageManager.NameNotFoundException e) {
-                    Log.v(TAG, "target package " + targetName + " not found");
-                }
-            }
+            OverlayTarget overlayTarget = new OverlayTarget(packageName);
+            overlayTarget.setLabel(ai.loadLabel(mPackageManager).toString());
+            return overlayTarget;
         } catch (Exception e) {
-             e.printStackTrace();Log.e(TAG, "Failed to get targets of theme " + packageName);
+             Log.e(TAG, "Failed to get info of " + packageName);
         }
-
-        return overlayTargets;
+        return null;
     }
 
     private static Intent getBroadcastIntent(String action, Theme theme) {
