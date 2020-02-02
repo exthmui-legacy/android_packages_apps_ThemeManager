@@ -50,9 +50,11 @@ public class MainActivity extends Activity {
     private Intent mThemeDataService;
     private ThemeDataService.ThemeDataBinder mThemeDataBinder;
     private ThemeDataConn mThemeDataConn;
+    private boolean themeDataServiceBindFlag = false;
     private Intent mThemeManageService;
     private ThemeManageService.ThemeManageBinder mThemeManageBinder;
     private ThemeManageConn mThemeManageConn;
+    private boolean themeManageServiceBindFlag = false;
 
     private List<Theme> mThemesList;
     private ThemeAdapter mThemeAdapter;
@@ -103,9 +105,17 @@ public class MainActivity extends Activity {
         mThemeDataService = new Intent(this, ThemeDataService.class);
         mThemeDataConn = new ThemeDataConn();
 
+        startService(mThemeDataService);
         startService(mThemeManageService);
         bindService(mThemeManageService, mThemeManageConn, Context.BIND_AUTO_CREATE);
 
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (themeManageServiceBindFlag) unbindService(mThemeManageConn);
+        if (themeDataServiceBindFlag) unbindService(mThemeDataConn);
     }
 
     private void askUninstallTheme(int index) {
@@ -136,13 +146,6 @@ public class MainActivity extends Activity {
                 .show();
     }
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        unbindService(mThemeManageConn);
-        unbindService(mThemeDataConn);
-    }
-
     private class ThemeManageConn implements ServiceConnection {
         @Override
         public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
@@ -150,6 +153,8 @@ public class MainActivity extends Activity {
 
             mThemesList.addAll(mThemeManageBinder.getThemesList());
             mThemeAdapter.notifyDataSetChanged();
+
+            themeManageServiceBindFlag = true;
 
             bindService(mThemeDataService, mThemeDataConn, Context.BIND_AUTO_CREATE);
         }
@@ -194,6 +199,8 @@ public class MainActivity extends Activity {
                     });
                 }
             });
+
+            themeDataServiceBindFlag = true;
 
             mThemeDataBinder.setThemeList(mThemesList);
         }

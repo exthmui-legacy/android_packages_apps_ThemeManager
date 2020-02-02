@@ -50,10 +50,12 @@ public class ThemePreview extends Activity {
     private Intent mThemeDataService;
     private ThemeDataService.ThemeDataBinder mThemeDataBinder;
     private ThemeDataConn mThemeDataConn;
+    private boolean themeDataServiceBindFlag = false;
     private ThemeDataService.ThemeDataUpdateListener themeDataUpdateListener;
     private Intent mThemeManageService;
     private ThemeManageService.ThemeManageBinder mThemeManageBinder;
     private ThemeManageConn mThemeManageConn;
+    private boolean themeManageServiceBindFlag = false;
 
     private LinearLayout appLayout;
     private LinearLayout previewLayout;
@@ -163,9 +165,11 @@ public class ThemePreview extends Activity {
         switchStatus.put("wallpaper", false);
         switchStatus.put("lockscreen", false);
 
-        switchStatus.put("ringtone",false);
+        switchStatus.put("ringtone", false);
         switchStatus.put("alarm", false);
         switchStatus.put("notification", false);
+
+        btnApply.setEnabled(!mThemeDataBinder.getIsApplying());
 
         // wallpaper
         if (mTheme.hasWallpaper()) {
@@ -294,15 +298,15 @@ public class ThemePreview extends Activity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        mThemeDataBinder.removeDataUpdateListener(themeDataUpdateListener);
-        unbindService(mThemeManageConn);
-        unbindService(mThemeDataConn);
+        if (themeManageServiceBindFlag) unbindService(mThemeManageConn);
+        if (themeDataServiceBindFlag) unbindService(mThemeDataConn);
     }
 
     private class ThemeManageConn implements ServiceConnection {
         @Override
         public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
             mThemeManageBinder = (ThemeManageService.ThemeManageBinder) iBinder;
+            themeManageServiceBindFlag = true;
             bindService(mThemeDataService, mThemeDataConn, Context.BIND_AUTO_CREATE);
         }
 
@@ -315,16 +319,15 @@ public class ThemePreview extends Activity {
         @Override
         public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
             mThemeDataBinder = (ThemeDataService.ThemeDataBinder) iBinder;
-
-            btnApply.setEnabled(!mThemeDataBinder.getIsApplying());
             mTheme = mThemeDataBinder.getThemeList().get(themeIndex);
-
             mThemeDataBinder.setDataUpdateListener(themeDataUpdateListener);
+            themeDataServiceBindFlag = true;
             updateView();
         }
 
         @Override
         public void onServiceDisconnected(ComponentName name) {
+            mThemeDataBinder.removeDataUpdateListener(themeDataUpdateListener);
         }
     }
 }
