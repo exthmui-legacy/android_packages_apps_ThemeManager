@@ -144,7 +144,8 @@
                             style="@style/skin_preview_layout"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:orientation="horizontal" />
+                            android:orientation="horizontal"
+                            android:paddingBottom="@dimen/picker_activity_padding_bottom" />
                     </HorizontalScrollView>
                 </LinearLayout>
 
