@@ -261,10 +261,9 @@ public class ThemeManageService extends Service {
         for (PackageInfo pkgInfo : allPackages) {
             ApplicationInfo ai = pkgInfo.applicationInfo;
 
-            if (ai.packageName.startsWith(OverlayPackageHeader)) {
-                String overlayTarget = ai.metaData.getString("target_package");
+            if (pkgInfo.packageName.startsWith(OverlayPackageHeader)) {
 
-                if (whiteList.contains(overlayTarget)) {
+                if (whiteList.contains(pkgInfo.overlayTarget)) {
                     continue;
                 }
 
