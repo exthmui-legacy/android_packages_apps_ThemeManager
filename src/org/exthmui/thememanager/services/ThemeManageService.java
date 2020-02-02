@@ -183,7 +183,7 @@ public class ThemeManageService extends Service {
 
             if (previewsArray != null) {
                 for (String preview : previewsArray) {
-                    InputStream inputStream = assetManager.open(preview);
+                    InputStream inputStream = assetManager.open("previews/" + preview);
                     Drawable drawable = Drawable.createFromStream(inputStream, preview);
                     previewList.add(drawable);
                 }
