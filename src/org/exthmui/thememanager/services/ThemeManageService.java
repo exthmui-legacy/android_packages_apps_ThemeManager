@@ -249,13 +249,13 @@ public class ThemeManageService extends Service {
                             // background
                             case "wallpaper":
                                 if ((attrMap.isEmpty() && !theme.hasWallpaper()) ||
-                                        (displayMetrics.widthPixels / attrMap.getOrDefault("ratioX", 1) == attrMap.getOrDefault("ratioY", 1))) {
+                                        (displayMetrics.widthPixels / attrMap.getOrDefault("ratioX", 1) == displayMetrics.heightPixels / attrMap.getOrDefault("ratioY", 1))) {
                                     theme.setWallpaper(themeInfoXml.getText());
                                 }
                                 break;
                             case "lockscreen":
                                 if ((attrMap.isEmpty() && !theme.hasLockScreen()) ||
-                                        (displayMetrics.widthPixels / attrMap.getOrDefault("ratioX", 1) == attrMap.getOrDefault("ratioY", 1))) {
+                                        (displayMetrics.widthPixels / attrMap.getOrDefault("ratioX", 1) == displayMetrics.heightPixels / attrMap.getOrDefault("ratioY", 1))) {
                                     theme.setLockScreen(themeInfoXml.getText());
                                 }
                                 break;
