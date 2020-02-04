@@ -201,6 +201,7 @@ public class ThemeManageService extends Service {
             ApplicationInfo ai = mPackageManager.getApplicationInfo(packageName, PackageManager.GET_META_DATA);
             Resources resources = mPackageManager.getResourcesForApplication(packageName);
             Theme theme = new Theme(packageName);
+            theme.setName(ai.loadLabel(mPackageManager).toString());
 
             Stack<String> xmlTags = new Stack<>();
             Map<String, Integer> attrMap = new HashMap<>();
@@ -238,9 +239,6 @@ public class ThemeManageService extends Service {
                     case XmlResourceParser.TEXT:
                         switch (xmlTags.peek()) {
                             // basic info
-                            case "name":
-                                theme.setName(themeInfoXml.getText());
-                                break;
                             case "author":
                                 theme.setAuthor(themeInfoXml.getText());
                                 break;
