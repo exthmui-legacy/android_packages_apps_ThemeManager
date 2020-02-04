@@ -21,6 +21,8 @@ public class OverlayTarget {
     private String packageName;
     private String label;
 
+    private boolean isSwitchable;
+
     public OverlayTarget(String packageName) {
         this.packageName = packageName;
     }
@@ -29,12 +31,20 @@ public class OverlayTarget {
         this.label = label;
     }
 
+    public void setSwitchable(boolean switchable) {
+        this.isSwitchable = switchable;
+    }
+
     public String getLabel() {
         return label;
     }
 
     public String getPackageName() {
         return packageName;
+    }
+
+    public boolean getSwitchable() {
+        return isSwitchable;
     }
 
 }

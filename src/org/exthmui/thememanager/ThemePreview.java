@@ -173,10 +173,10 @@ public class ThemePreview extends Activity {
 
         // wallpaper
         if (mTheme.hasWallpaper()) {
-            addSwitch(wallpaperLayout, "wallpaper", R.string.skin_picker_switch_wallpaper, true);
+            addSwitch(wallpaperLayout, "wallpaper", R.string.skin_picker_switch_wallpaper, true, true);
         }
         if (mTheme.hasLockScreen()) {
-            addSwitch(wallpaperLayout, "lockscreen", R.string.skin_picker_switch_lockscreen, true);
+            addSwitch(wallpaperLayout, "lockscreen", R.string.skin_picker_switch_lockscreen, true, true);
         }
 
         if (!mTheme.hasWallpaper() && !mTheme.hasLockScreen()) {
@@ -185,13 +185,13 @@ public class ThemePreview extends Activity {
 
         // sound
         if (mTheme.hasRingtone()) {
-            addSwitch(soundLayout, "ringtone", R.string.skin_picker_switch_ringtone, true);
+            addSwitch(soundLayout, "ringtone", R.string.skin_picker_switch_ringtone, true, true);
         }
         if (mTheme.hasAlarmSound()) {
-            addSwitch(soundLayout, "alarm", R.string.skin_picker_switch_alarm, true);
+            addSwitch(soundLayout, "alarm", R.string.skin_picker_switch_alarm, true, true);
         }
         if (mTheme.hasNotificationSound()) {
-            addSwitch(soundLayout, "notification", R.string.skin_picker_switch_notification, true);
+            addSwitch(soundLayout, "notification", R.string.skin_picker_switch_notification, true, true);
         }
 
         if (!mTheme.hasRingtone() && !mTheme.hasAlarmSound() && !mTheme.hasNotificationSound()) {
@@ -201,7 +201,7 @@ public class ThemePreview extends Activity {
         // apps
         if (mTheme.hasOverlays()) {
             for (OverlayTarget overlayTarget : mTheme.getOverlayTargets()) {
-                addSwitch(appLayout, overlayTarget.getPackageName(), overlayTarget.getLabel(), true);
+                addSwitch(appLayout, overlayTarget.getPackageName(), overlayTarget.getLabel(), true, overlayTarget.getSwitchable());
             }
         } else {
             appLayout.setVisibility(View.GONE);
@@ -246,11 +246,11 @@ public class ThemePreview extends Activity {
         return mThemeManageBinder.applyTheme(bundle);
     }
 
-    private void addSwitch(LinearLayout layout, final String id, int text, boolean defaultValue) {
-        addSwitch(layout, id, getString(text), defaultValue);
+    private void addSwitch(LinearLayout layout, final String id, int text, boolean defaultValue, boolean enabled) {
+        addSwitch(layout, id, getString(text), defaultValue, enabled);
     }
 
-    private void addSwitch(LinearLayout layout, final String id, String text, boolean defaultValue) {
+    private void addSwitch(LinearLayout layout, final String id, String text, boolean defaultValue, boolean enabled) {
         int paddingTop = getResources().getDimensionPixelOffset(R.dimen.picker_switch_padding_top);
         int paddingBottom = getResources().getDimensionPixelOffset(R.dimen.picker_switch_padding_bottom);
         int paddingLeft = getResources().getDimensionPixelOffset(R.dimen.picker_switch_padding_left);
@@ -269,6 +269,8 @@ public class ThemePreview extends Activity {
                 switchStatus.put(id, b);
             }
         });
+
+        tmpSwitch.setEnabled(enabled);
 
         layout.addView(tmpSwitch);
     }

@@ -208,6 +208,7 @@ public class ThemeManageService extends Service {
             int themeInfoXmlResId = resources.getIdentifier("theme_info", "xml", packageName);
             XmlResourceParser themeInfoXml = resources.getXml(themeInfoXmlResId);
             int eventType = themeInfoXml.getEventType();
+            boolean overlaySwitchable = true;
 
             while (eventType != XmlResourceParser.END_DOCUMENT) {
                 switch (eventType) {
@@ -216,6 +217,15 @@ public class ThemeManageService extends Service {
                         switch (xmlTags.peek()) {
                             case "overlay":
                                 overlayTargetList.clear();
+                                break;
+                            case "target":
+                                overlaySwitchable = true;
+                                for (int i = 0; i < themeInfoXml.getAttributeCount(); i++) {
+                                    if (themeInfoXml.getAttributeName(i).equals("switchable")) {
+                                        overlaySwitchable = themeInfoXml.getAttributeBooleanValue(i, true);
+                                        break;
+                                    }
+                                }
                                 break;
                             case "wallpaper": case "lockscreen":
                                 attrMap.clear();
@@ -263,7 +273,10 @@ public class ThemeManageService extends Service {
                             // overlay
                             case "target":
                                 OverlayTarget ovt = getOverlayTarget(themeInfoXml.getText());
-                                if (ovt != null) overlayTargetList.add(ovt);
+                                if (ovt != null) {
+                                    ovt.setSwitchable(overlaySwitchable);
+                                    overlayTargetList.add(ovt);
+                                }
                                 break;
                         }
                         break;
