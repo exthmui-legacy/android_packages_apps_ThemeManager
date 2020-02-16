@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/preview_fragment"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".fragments.ThemePreviewFragment">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:background="?android:colorPrimary"
+                    android:clipChildren="false"
+                    android:orientation="vertical">
+
+                    <ImageView
+                        android:id="@+id/banner_image"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:adjustViewBounds="true"
+                        android:contentDescription="@null" />
+
+                    <LinearLayout
+                        android:layout_width="fill_parent"
+                        android:layout_height="72.0dip"
+                        android:layout_gravity="center_vertical"
+                        android:background="?android:colorPrimary"
+                        android:clipChildren="false"
+                        android:elevation="4.0dip"
+                        android:orientation="vertical"
+                        android:paddingStart="@dimen/picker_activity_padding_start"
+                        android:paddingTop="@dimen/picker_activity_padding_top"
+                        android:paddingEnd="@dimen/picker_activity_padding_end"
+                        android:paddingBottom="@dimen/picker_activity_padding_bottom"
+                        android:theme="@android:style/Theme.DeviceDefault">
+
+                        <TextView
+                            android:id="@+id/theme_title"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:ellipsize="end"
+                            android:maxLines="@integer/preview_skin_title_max_rows"
+                            android:paddingBottom="8.0dip"
+                            android:textAppearance="?android:textAppearanceMediumInverse"
+                            android:textColor="?android:textColorPrimary"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/theme_author"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textAppearance="?android:textAppearanceSmallInverse"
+                            android:textColor="?android:textColorSecondary" />
+                    </LinearLayout>
+
+                </LinearLayout>
+
+                <Button
+                    android:id="@+id/apply_theme_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:baselineAligned="false"
+                    android:gravity="center"
+                    android:text="@string/skin_picker_button_apply"
+                    android:theme="@style/Theme.Picker.ApplySkinButton" />
+
+                <LinearLayout
+                    android:id="@+id/layout_targets"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical">
+
+                    <LinearLayout
+                        android:id="@+id/wallpaper_container"
+                        android:layout_width="fill_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+
+                        <TextView
+                            style="@style/skin_preview_subheader"
+                            android:text="@string/separator_background" />
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/sound_container"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:orientation="vertical">
+
+                        <TextView
+                            style="@style/skin_preview_subheader"
+                            android:text="@string/separator_sound" />
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/app_container"
+                        android:layout_width="fill_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+
+                        <TextView
+                            style="@style/skin_preview_subheader"
+                            android:text="@string/separator_app" />
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/layout_previews"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical">
+
+                    <TextView
+                        style="@style/skin_preview_subheader"
+                        android:text="@string/separator_preview" />
+
+                    <HorizontalScrollView
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent">
+
+                        <LinearLayout
+                            android:id="@+id/layout_preview_pic"
+                            style="@style/skin_preview_layout"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:paddingBottom="@dimen/picker_activity_padding_bottom" />
+                    </HorizontalScrollView>
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <ImageButton
+                android:id="@+id/button_back"
+                android:layout_width="@dimen/back_button_width"
+                android:layout_height="@dimen/back_button_height"
+                android:layout_margin="@dimen/button_margin"
+                android:background="@drawable/shape_btn_circle"
+                android:contentDescription="@null"
+                android:src="@drawable/ic_back_arrow" />
+        </FrameLayout>
+    </ScrollView>
+
+    <ImageView
+        android:id="@+id/preview_viewer"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/theme_preview_overlay"
+        android:contentDescription="@null"
+        android:visibility="gone" />
+
+</FrameLayout>

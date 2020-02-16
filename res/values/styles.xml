@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="action_bar" parent="@android:style/Widget.DeviceDefault.ActionBar.Solid">
+        <item name="android:contentInsetStart">@dimen/picker_actionbar_content_inset_start</item>
+    </style>
+
+    <style name="Theme.Picker" parent="@android:style/Theme.DeviceDefault.Settings">
+        <item name="android:actionBarStyle">@style/action_bar</item>
+    </style>
+
+    <style name="Theme.Picker.ApplySkinButton" parent="@android:style/Theme.DeviceDefault">
+        <item name="android:colorButtonNormal">?android:colorAccent</item>
+    </style>
+
+    <style name="Theme.Picker.SkinPickerActivity" parent="Theme.Picker" />
+
+    <style name="common_subheader" parent="@android:style/TextAppearance.Material.Body2">
+        <item name="android:textColor">?android:colorAccent</item>
+        <item name="android:gravity">start|center</item>
+        <item name="android:focusable">false</item>
+        <item name="android:focusableInTouchMode">false</item>
+        <item name="android:clickable">false</item>
+        <item name="android:layout_width">fill_parent</item>
+        <item name="android:layout_height">48.0dip</item>
+        <item name="android:paddingStart">@dimen/picker_activity_padding_start</item>
+        <item name="android:paddingEnd">@dimen/picker_activity_padding_end</item>
+    </style>
+
+    <style name="skin_preview_subheader" parent="common_subheader">
+        <item name="android:paddingEnd">@dimen/preview_activity_subheader_padding_end</item>
+    </style>
+
+    <style name="item_base">
+        <item name="android:layout_width">fill_parent</item>
+        <item name="android:layout_marginBottom">@dimen/card_margin_large</item>
+        <item name="android:layout_marginStart">@dimen/card_margin_small</item>
+        <item name="android:layout_marginEnd">@dimen/card_margin_small</item>
+        <item name="android:elevation">2.0dip</item>
+    </style>
+
+    <style name="item_skin" parent="item_base">
+        <item name="android:orientation">vertical</item>
+        <item name="android:layout_height">fill_parent</item>
+    </style>
+
+    <style name="item_skin_skinImage">
+        <item name="android:background">?android:selectableItemBackground</item>
+        <item name="android:scaleType">centerCrop</item>
+        <item name="android:adjustViewBounds">true</item>
+    </style>
+
+    <style name="item_skin_skinImageOverlay">
+        <item name="android:background">?android:selectableItemBackground</item>
+        <item name="android:scaleType">centerInside</item>
+    </style>
+
+    <style name="skin_preview_layout">
+        <item name="android:divider">@drawable/shape_divider</item>
+        <item name="android:showDividers">middle|beginning|end</item>
+    </style>
+
+    <style name="item_skin_skinTitle" parent="@android:style/Widget.DeviceDefault.Light.TextView">
+        <item name="android:textAppearance">?android:textAppearanceSmall</item>
+        <item name="android:textColor">?android:textColorPrimary</item>
+        <item name="android:gravity">start|center|top</item>
+        <item name="android:layout_width">fill_parent</item>
+        <item name="android:layout_height">fill_parent</item>
+        <item name="android:layout_marginTop">@dimen/card_margin_large</item>
+        <item name="android:layout_marginBottom">@dimen/card_margin_bottom</item>
+        <item name="android:textAlignment">viewStart</item>
+        <item name="android:layout_marginStart">@dimen/card_margin_large</item>
+        <item name="android:layout_marginEnd">@dimen/card_margin_large</item>
+    </style>
+
+    <style name="skin_applying_dialog">
+        <item name="android:paddingStart">@dimen/applying_layout_padding_start</item>
+        <item name="android:paddingTop">@dimen/applying_layout_padding_top</item>
+        <item name="android:paddingEnd">@dimen/applying_layout_padding_end</item>
+        <item name="android:paddingBottom">@dimen/applying_layout_padding_bottom</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:windowIsFloating">true</item>
+    </style>
+
+    <style name="skin_applying_dialog_button" parent="@android:style/Widget.DeviceDefault.Button.Borderless.Small">
+        <item name="android:textColor">?android:colorAccent</item>
+    </style>
+</resources>
