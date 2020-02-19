@@ -104,11 +104,6 @@ public class ThemeDataService extends Service {
         List<PackageInfo> allPackages = mPackageManager.getInstalledPackages(0);
         mThemeBaseList.clear();
 
-        // add default theme
-        ThemeBase defaultTheme = new ThemeBase(getPackageName());
-        IGetThemeBaseInfo(defaultTheme);
-        mThemeBaseList.add(defaultTheme);
-
         for (PackageInfo pkgInfo : allPackages) {
             if (IsThemePackage(pkgInfo.packageName)) {
                 ThemeBase themeBase = new ThemeBase(pkgInfo.packageName);

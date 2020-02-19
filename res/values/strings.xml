@@ -19,9 +19,6 @@
 <resources>
     <string name="app_name">Theme</string>
 
-    <string name="theme_title">Default Theme</string>
-    <string name="theme_author">exTHmUI</string>
-
     <string name="skin_picker_button_apply">Apply Theme</string>
 
     <string name="separator_sound">Sound</string>

@@ -19,9 +19,6 @@
 <resources>
     <string name="app_name">主题</string>
 
-    <string name="theme_title">默认主题</string>
-    <string name="theme_author">exTHmUI</string>
-
     <string name="skin_picker_button_apply">应用主题</string>
 
     <string name="separator_sound">声音</string>
