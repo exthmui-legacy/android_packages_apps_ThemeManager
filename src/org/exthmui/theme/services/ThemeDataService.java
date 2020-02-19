@@ -236,7 +236,6 @@ public class ThemeDataService extends Service {
             themeAccent.setAuthor("LineageOS");
             themeAccent.setAccentColor(ai.metaData.getInt("lineage_berry_accent_preview",0));
             themeAccent.setRemovable((ai.flags & ApplicationInfo.FLAG_SYSTEM) != 0);
-            themeAccent.setOverlayTarget(getOverlayTarget("android"));
             return themeAccent;
         } catch (Exception e) {
             Log.e(TAG, "Failed to get theme info: " + packageName);
