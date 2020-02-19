@@ -34,6 +34,8 @@ import android.os.UserHandle;
 import android.util.Log;
 
 import org.exthmui.theme.models.OverlayTarget;
+import org.exthmui.theme.models.ThemeAccent;
+import org.exthmui.theme.models.ThemeBase;
 import org.exthmui.theme.models.ThemeItem;
 import org.exthmui.theme.utils.PackageUtil;
 import org.exthmui.theme.utils.SoundUtil;
@@ -84,6 +86,10 @@ public class ThemeManageService extends Service {
     public class ThemeManageBinder extends Binder {
         public boolean applyTheme(ThemeItem theme, Bundle bundle) {
             return IApplyTheme(theme, bundle);
+        }
+
+        public boolean applyThemeAccent(ThemeAccent themeAccent, Bundle bundle) {
+            return IApplyThemeAccent(themeAccent, bundle);
         }
 
         public void removeThemeOverlays(Bundle bundle) {
@@ -255,6 +261,31 @@ public class ThemeManageService extends Service {
         return ret;
     }
 
+    private boolean IApplyThemeAccent(ThemeAccent theme, Bundle bundle) {
+        final ArrayList<String> whiteList = bundle.getStringArrayList("whitelist");
+        final int userId = UserHandle.myUserId();
+        boolean ret = true;
+        mApplyStatusQueue.clear();
+
+        try {
+            setThemeApplyStatus(THEME_APPLYING, theme);
+            IRemoveThemeOverlays(bundle);
+            Thread.sleep(1000);
+            mOverlayService.setEnabled(theme.getPackageName(), true, userId);
+            Thread.sleep(1000);
+        } catch (Exception e) {
+            Log.e(TAG, "Failed to apply theme " + theme.getPackageName());
+            ret = false;
+        }
+
+        if (ret) {
+            setThemeApplyStatus(THEME_APPLY_SUCCEED, theme);
+        } else {
+            setThemeApplyStatus(THEME_APPLY_FAILED, theme);
+        }
+        return ret;
+    }
+
     private boolean isThemeOverlayPackage(String packageName) {
         boolean ret = false;
         try {
@@ -262,18 +293,19 @@ public class ThemeManageService extends Service {
             ApplicationInfo ai = pi.applicationInfo;
             ret =  pi.isOverlayPackage() &&
                     ((ai.flags & ApplicationInfo.FLAG_HAS_CODE) == 0) &&
-                    (ai.metaData.getBoolean("exthmui_theme_overlay", false));
+                    ((ai.metaData.getBoolean("exthmui_theme_overlay", false)) ||
+                    (ai.metaData.getInt("lineage_berry_accent_preview",0) != 0));
         } catch (Exception e) {
             Log.e(TAG, "check package " + packageName + " failed");
         }
         return ret;
     }
 
-    private void setThemeApplyStatus(String action, ThemeItem theme) {
+    private void setThemeApplyStatus(String action, ThemeBase theme) {
         setThemeApplyStatus(action, theme, null);
     }
 
-    private void setThemeApplyStatus(String status, ThemeItem theme, Intent extraData) {
+    private void setThemeApplyStatus(String status, ThemeBase theme, Intent extraData) {
         Intent intent = new Intent(ThemeManageService.BROADCAST_ACTION_APPLY_RESULT);
         intent.setComponent(new ComponentName(getPackageName(), getPackageName() + ".broadcasts.ThemeStatusReceiver"));
         intent.putExtra("status", status);

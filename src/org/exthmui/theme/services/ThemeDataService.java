@@ -31,7 +31,9 @@ import android.os.IBinder;
 import android.util.DisplayMetrics;
 import android.util.Log;
 
+import org.exthmui.theme.R;
 import org.exthmui.theme.models.OverlayTarget;
+import org.exthmui.theme.models.ThemeAccent;
 import org.exthmui.theme.models.ThemeBase;
 import org.exthmui.theme.models.ThemeItem;
 
@@ -73,6 +75,18 @@ public class ThemeDataService extends Service {
             IUpdateThemeList();
         }
 
+        public boolean isThemePackage(String packageName) {
+            return IsThemePackage(packageName);
+        }
+
+        public boolean isAccentColorPackage(String packageName) {
+            return IsAccentColorPackage(packageName);
+        }
+
+        public ThemeAccent getThemeAccent(String packageName) {
+            return IGetThemeAccent(packageName);
+        }
+
         public ThemeItem getThemeItem(String packageName) {
             return IGetThemeItem(packageName);
         }
@@ -100,16 +114,20 @@ public class ThemeDataService extends Service {
         mThemeBaseList.add(defaultTheme);
 
         for (PackageInfo pkgInfo : allPackages) {
-            if (isThemePackage(pkgInfo.packageName)) {
+            if (IsThemePackage(pkgInfo.packageName)) {
                 ThemeBase themeBase = new ThemeBase(pkgInfo.packageName);
                 IGetThemeBaseInfo(themeBase);
                 mThemeBaseList.add(themeBase);
+            } else if (IsAccentColorPackage(pkgInfo.packageName)) {
+                ThemeAccent themeAccent = IGetThemeAccent(pkgInfo.packageName);
+                mThemeBaseList.add(themeAccent);
             }
         }
     }
 
-    private boolean isThemePackage(String packageName) {
+    private boolean IsThemePackage(String packageName) {
         boolean ret = false;
+        if (getPackageName().equals(packageName)) return true;
         try {
             ApplicationInfo ai = mPackageManager.getApplicationInfo(packageName, PackageManager.GET_META_DATA);
             Bundle metadata = ai.metaData;
@@ -122,11 +140,25 @@ public class ThemeDataService extends Service {
         return ret;
     }
 
+    private boolean IsAccentColorPackage(String packageName) {
+        boolean ret = false;
+        try {
+            ApplicationInfo ai = mPackageManager.getApplicationInfo(packageName, PackageManager.GET_META_DATA);
+            Bundle metadata = ai.metaData;
+            if (metadata != null) {
+                ret = metadata.getInt("lineage_berry_accent_preview",0) != 0;
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "check package " + packageName + " failed");
+        }
+        return ret;
+    }
+
     private Drawable IGetThemeBanner(String packageName) {
         try {
             Resources resources = mPackageManager.getResourcesForApplication(packageName);
             int bannerResId = resources.getIdentifier("theme_banner", "drawable", packageName);
-            return  resources.getDrawable(bannerResId, null);
+            return resources.getDrawable(bannerResId, null);
         } catch (Exception e) {
             Log.e(TAG, "Failed to get banner of " + packageName);
         }
@@ -192,6 +224,23 @@ public class ThemeDataService extends Service {
             themeBase.setRemovable((ai.flags & ApplicationInfo.FLAG_SYSTEM) != 0);
         } catch (Exception e) {
             Log.e(TAG, "Failed to get theme info: " + packageName);
+        }
+    }
+
+    private ThemeAccent IGetThemeAccent(String packageName) {
+        try {
+            ApplicationInfo ai = mPackageManager.getApplicationInfo(packageName, PackageManager.GET_META_DATA);
+            ThemeAccent themeAccent = new ThemeAccent(packageName);
+
+            themeAccent.setTitle(ai.loadLabel(mPackageManager).toString());
+            themeAccent.setAuthor("LineageOS");
+            themeAccent.setAccentColor(ai.metaData.getInt("lineage_berry_accent_preview",0));
+            themeAccent.setRemovable((ai.flags & ApplicationInfo.FLAG_SYSTEM) != 0);
+            themeAccent.setOverlayTarget(getOverlayTarget("android"));
+            return themeAccent;
+        } catch (Exception e) {
+            Log.e(TAG, "Failed to get theme info: " + packageName);
+            return null;
         }
     }
 

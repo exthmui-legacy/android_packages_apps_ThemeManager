@@ -207,6 +207,17 @@ public abstract class CommonAdapter<T> extends BaseAdapter {
             return this;
         }
 
+        public ViewHolder setBackgroundColor(int id, int color) {
+            View view = getView(id);
+            view.setBackgroundColor(color);
+            return this;
+        }
+
+        public ViewHolder setBackgroundResource(int id, int drawableId) {
+            View view = getView(id);
+            view.setBackgroundResource(drawableId);
+            return this;
+        }
     }
 
 }

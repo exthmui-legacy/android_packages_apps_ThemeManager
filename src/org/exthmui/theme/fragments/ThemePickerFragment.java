@@ -32,6 +32,7 @@ import android.widget.GridView;
 import org.exthmui.theme.R;
 import org.exthmui.theme.adapters.CommonAdapter;
 import org.exthmui.theme.interfaces.ThemePickerInterface;
+import org.exthmui.theme.models.ThemeAccent;
 import org.exthmui.theme.models.ThemeBase;
 
 import java.util.List;
@@ -105,13 +106,24 @@ public class ThemePickerFragment extends Fragment {
             new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    Drawable drawable =  mCallback.getThemeImage(obj.getPackageName());
-                    getActivity().runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            holder.setImageResource(R.id.theme_card_image, drawable);
-                        }
-                    });
+                    if (obj instanceof ThemeAccent) {
+                        getActivity().runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                holder.setImageResource(R.id.theme_card_image, R.drawable.theme_accent_image);
+                                holder.setBackgroundColor(R.id.theme_card_image, ((ThemeAccent) obj).getAccentColor());
+                            }
+                        });
+                    } else {
+                        Drawable drawable =  mCallback.getThemeImage(obj.getPackageName());
+                        getActivity().runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                holder.setImageResource(R.id.theme_card_image, drawable);
+                            }
+                        });
+                    }
+
                 }
             }).start();
 

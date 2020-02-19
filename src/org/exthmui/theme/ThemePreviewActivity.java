@@ -30,6 +30,7 @@ import android.util.Log;
 import org.exthmui.theme.fragments.ThemeApplyingDialog;
 import org.exthmui.theme.fragments.ThemePreviewFragment;
 import org.exthmui.theme.interfaces.ThemePreviewInterface;
+import org.exthmui.theme.models.ThemeAccent;
 import org.exthmui.theme.models.ThemeItem;
 import org.exthmui.theme.services.ThemeDataService;
 import org.exthmui.theme.services.ThemeManageService;
@@ -51,6 +52,7 @@ public class ThemePreviewActivity extends FragmentActivity implements ThemePrevi
     private ThemePreviewFragment mFragment;
     private ThemeApplyingDialog mApplyingDialog;
     private ThemeItem mThemeItem;
+    private ThemeAccent mThemeAccent;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -118,7 +120,11 @@ public class ThemePreviewActivity extends FragmentActivity implements ThemePrevi
         new Thread(new Runnable() {
             @Override
             public void run() {
-                mThemeManageBinder.applyTheme(mThemeItem, bundle);
+                if (mThemeItem != null) {
+                    mThemeManageBinder.applyTheme(mThemeItem, bundle);
+                } else if (mThemeAccent != null) {
+                    mThemeManageBinder.applyThemeAccent(mThemeAccent, bundle);
+                }
             }
         }).start();
     }
@@ -127,8 +133,13 @@ public class ThemePreviewActivity extends FragmentActivity implements ThemePrevi
         @Override
         public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
             mThemeDataBinder = (ThemeDataService.ThemeDataBinder) iBinder;
-            mThemeItem = mThemeDataBinder.getThemeItem(mThemePackageName);
-            mFragment.setThemeItem(mThemeItem);
+            if (mThemeDataBinder.isThemePackage(mThemePackageName)) {
+                mThemeItem = mThemeDataBinder.getThemeItem(mThemePackageName);
+                mFragment.setThemeItem(mThemeItem);
+            } else if (mThemeDataBinder.isAccentColorPackage(mThemePackageName)) {
+                mThemeAccent = mThemeDataBinder.getThemeAccent(mThemePackageName);
+                mFragment.setThemeAccent(mThemeAccent);
+            }
         }
 
         @Override

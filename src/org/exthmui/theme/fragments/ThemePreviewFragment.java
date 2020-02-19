@@ -37,6 +37,8 @@ import android.widget.TextView;
 import org.exthmui.theme.R;
 import org.exthmui.theme.interfaces.ThemePreviewInterface;
 import org.exthmui.theme.models.OverlayTarget;
+import org.exthmui.theme.models.ThemeAccent;
+import org.exthmui.theme.models.ThemeBase;
 import org.exthmui.theme.models.ThemeItem;
 
 import java.util.ArrayList;
@@ -49,6 +51,7 @@ public class ThemePreviewFragment extends Fragment {
     private static final String TAG = "ThemePreviewFragment";
 
     private ThemeItem mThemeItem;
+    private ThemeAccent mThemeAccent;
     private ThemePreviewInterface mCallback;
     private View view;
     private Map<String, Boolean> mThemeTargetMap;
@@ -99,24 +102,32 @@ public class ThemePreviewFragment extends Fragment {
         btnApply.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Bundle bundle = new Bundle();
-                bundle.putString("package", mThemeItem.getPackageName());
-                bundle.putBoolean("ringtone", mThemeTargetMap.get("ringtone"));
-                bundle.putBoolean("alarm", mThemeTargetMap.get("alarm"));
-                bundle.putBoolean("notification", mThemeTargetMap.get("notification"));
-                bundle.putBoolean("wallpaper", mThemeTargetMap.get("wallpaper"));
-                bundle.putBoolean("lockscreen", mThemeTargetMap.get("lockscreen"));
+                if (mThemeItem != null) {
+                    Bundle bundle = new Bundle();
+                    bundle.putString("package", mThemeItem.getPackageName());
+                    bundle.putBoolean("ringtone", mThemeTargetMap.get("ringtone"));
+                    bundle.putBoolean("alarm", mThemeTargetMap.get("alarm"));
+                    bundle.putBoolean("notification", mThemeTargetMap.get("notification"));
+                    bundle.putBoolean("wallpaper", mThemeTargetMap.get("wallpaper"));
+                    bundle.putBoolean("lockscreen", mThemeTargetMap.get("lockscreen"));
 
-                ArrayList<String> whiteList = new ArrayList<>();
-                for (Map.Entry<String, Boolean> entry : mThemeTargetMap.entrySet()) {
-                    String key = entry.getKey();
-                    if (!entry.getValue() && !key.equals("wallpaper") && !key.equals("lockscreen")
-                            && !key.equals("ringtone") && !key.equals("alarm") && !key.equals("notification")) {
-                        whiteList.add(key);
+                    ArrayList<String> whiteList = new ArrayList<>();
+                    for (Map.Entry<String, Boolean> entry : mThemeTargetMap.entrySet()) {
+                        String key = entry.getKey();
+                        if (!entry.getValue() && !key.equals("wallpaper") && !key.equals("lockscreen")
+                                && !key.equals("ringtone") && !key.equals("alarm") && !key.equals("notification")) {
+                            whiteList.add(key);
+                        }
                     }
+                    bundle.putStringArrayList("whitelist", whiteList);
+                    mCallback.applyTheme(bundle);
+                } else if (mThemeAccent != null) {
+                    Bundle bundle = new Bundle();
+                    bundle.putString("package", mThemeAccent.getPackageName());
+                    bundle.putStringArrayList("whitelist", new ArrayList<>());
+                    mCallback.applyTheme(bundle);
                 }
-                bundle.putStringArrayList("whitelist", whiteList);
-                mCallback.applyTheme(bundle);
+
             }
         });
 
@@ -144,13 +155,23 @@ public class ThemePreviewFragment extends Fragment {
     
     public void setThemeItem(ThemeItem themeItem) {
         mThemeItem = themeItem;
-        updateView();
+        updateThemeBase(mThemeItem);
+        updateViewForTheme();
     }
 
-    private void updateView() {
+    public void setThemeAccent(ThemeAccent themeAccent) {
+        mThemeAccent = themeAccent;
+        updateThemeBase(mThemeAccent);
+        updateViewForAccent();
+    }
+
+    private void updateThemeBase(ThemeBase themeBase) {
         // base info
-        tvTitle.setText(mThemeItem.getTitle());
-        tvAuthor.setText(mThemeItem.getAuthor());
+        tvTitle.setText(themeBase.getTitle());
+        tvAuthor.setText(themeBase.getAuthor());
+    }
+
+    private void updateViewForTheme() {
         imageBanner.setImageDrawable(mCallback.getThemeBanner(mThemeItem.getPackageName()));
 
         mThemeTargetMap.put("wallpaper", false);
@@ -206,6 +227,16 @@ public class ThemePreviewFragment extends Fragment {
             previewLayout.setVisibility(View.GONE);
         }
 
+    }
+
+    private void updateViewForAccent() {
+        imageBanner.setImageResource(R.drawable.theme_accent_banner);
+        imageBanner.setBackgroundColor(mThemeAccent.getAccentColor());
+        wallpaperLayout.setVisibility(View.GONE);
+        soundLayout.setVisibility(View.GONE);
+        appLayout.setVisibility(View.GONE);
+        previewLayout.setVisibility(View.GONE);
+        mThemeTargetMap.put("android", true);
     }
 
     private void addSwitch(LinearLayout layout, final String id, int text, boolean defaultValue, boolean enabled) {
