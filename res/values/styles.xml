@@ -1,19 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-
-    <style name="action_bar" parent="@android:style/Widget.DeviceDefault.ActionBar.Solid">
-        <item name="android:contentInsetStart">@dimen/picker_actionbar_content_inset_start</item>
-    </style>
-
-    <style name="Theme.Picker" parent="@android:style/Theme.DeviceDefault.Settings">
-        <item name="android:actionBarStyle">@style/action_bar</item>
-    </style>
-
     <style name="Theme.Picker.ApplySkinButton" parent="@android:style/Theme.DeviceDefault">
         <item name="android:colorButtonNormal">?android:colorAccent</item>
     </style>
-
-    <style name="Theme.Picker.SkinPickerActivity" parent="Theme.Picker" />
 
     <style name="common_subheader" parent="@android:style/TextAppearance.Material.Body2">
         <item name="android:textColor">?android:colorAccent</item>

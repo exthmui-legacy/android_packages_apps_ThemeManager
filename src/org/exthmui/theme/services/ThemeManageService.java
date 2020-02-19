@@ -68,9 +68,6 @@ public class ThemeManageService extends Service {
     private ThemeApplyStatusListener mApplyStatusListener;
     private Queue<Intent> mApplyStatusQueue;
 
-    public ThemeManageService() {
-    }
-
     @Override
     public void onCreate() {
         mOverlayService = IOverlayManager.Stub.asInterface(ServiceManager.getService("overlay"));
@@ -119,7 +116,7 @@ public class ThemeManageService extends Service {
 
             if (isThemeOverlayPackage(pkgInfo.packageName)) {
 
-                if (whiteList.contains(pkgInfo.overlayTarget)) {
+                if (whiteList != null && whiteList.contains(pkgInfo.overlayTarget)) {
                     continue;
                 }
 
@@ -262,7 +259,6 @@ public class ThemeManageService extends Service {
     }
 
     private boolean IApplyThemeAccent(ThemeAccent theme, Bundle bundle) {
-        final ArrayList<String> whiteList = bundle.getStringArrayList("whitelist");
         final int userId = UserHandle.myUserId();
         boolean ret = true;
         mApplyStatusQueue.clear();

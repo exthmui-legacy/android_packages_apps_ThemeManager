@@ -18,7 +18,7 @@ package org.exthmui.theme.models;
 
 public class OverlayTarget {
 
-    private String packageName;
+    private final String packageName;
     private String label;
 
     private boolean isSwitchable;

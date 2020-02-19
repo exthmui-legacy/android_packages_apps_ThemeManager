@@ -21,6 +21,7 @@ import android.content.Context;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.provider.MediaStore;
+import android.util.Log;
 
 import java.io.File;
 import java.io.IOException;
@@ -74,7 +75,12 @@ public class SoundUtil {
     }
 
     public static String getRingtonePath(Context context, String ringtoneName) {
-        return context.getExternalCacheDir().getPath() + "/ringtone/" + ringtoneName ;
+        try {
+            return context.getExternalCacheDir().getPath() + "/ringtone/" + ringtoneName;
+        } catch (Exception e) {
+            Log.e(TAG, "Failed to get path of ringtone cache");
+            return "";
+        }
     }
 
 }

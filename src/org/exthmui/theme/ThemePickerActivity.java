@@ -47,8 +47,6 @@ public class ThemePickerActivity extends FragmentActivity implements ThemePicker
     private List<ThemeBase> mThemeList;
     private ThemeDataService.ThemeDataBinder mThemeDataBinder;
     private ThemeDataConn mThemeDataConn;
-    private Intent mThemeDataService;
-    private Intent mThemeManageService;
     private ThemePickerFragment mFragment;
 
     @Override
@@ -66,9 +64,9 @@ public class ThemePickerActivity extends FragmentActivity implements ThemePicker
                     .commitNow();
         }
 
-        mThemeDataService = new Intent(this, ThemeDataService.class);
+        Intent mThemeDataService = new Intent(this, ThemeDataService.class);
         mThemeDataConn = new ThemeDataConn();
-        mThemeManageService = new Intent(this, ThemeManageService.class);
+        Intent mThemeManageService = new Intent(this, ThemeManageService.class);
         startService(mThemeManageService);
         startService(mThemeDataService);
         bindService(mThemeDataService, mThemeDataConn, Context.BIND_AUTO_CREATE);
@@ -139,9 +137,7 @@ public class ThemePickerActivity extends FragmentActivity implements ThemePicker
                     });
 
                 })
-                .setNegativeButton(android.R.string.cancel,  (dialogInterface, i) -> {
-                    dialogInterface.dismiss();
-                })
+                .setNegativeButton(android.R.string.cancel,  (dialogInterface, i) -> dialogInterface.dismiss())
                 .show();
     }
 
@@ -149,17 +145,9 @@ public class ThemePickerActivity extends FragmentActivity implements ThemePicker
         @Override
         public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
             mThemeDataBinder = (ThemeDataService.ThemeDataBinder) iBinder;
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    mThemeList = mThemeDataBinder.getThemeBaseList();
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            mFragment.updateView();
-                        }
-                    });
-                }
+            new Thread(() -> {
+                mThemeList = mThemeDataBinder.getThemeBaseList();
+                runOnUiThread(() -> mFragment.updateView());
             }).start();
         }
 

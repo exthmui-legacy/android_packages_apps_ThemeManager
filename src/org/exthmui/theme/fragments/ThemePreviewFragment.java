@@ -61,8 +61,6 @@ public class ThemePreviewFragment extends Fragment {
     private LinearLayout previewPicLayout;
     private LinearLayout soundLayout;
     private LinearLayout wallpaperLayout;
-    private Button btnApply;
-    private ImageView btnBack;
     private TextView tvTitle;
     private TextView tvAuthor;
     private ImageView imageBanner;
@@ -96,54 +94,41 @@ public class ThemePreviewFragment extends Fragment {
         tvAuthor = view.findViewById(R.id.theme_author);
         imageBanner = view.findViewById(R.id.banner_image);
         imagePreviewViewer = view.findViewById(R.id.preview_viewer);
-        btnApply = view.findViewById(R.id.apply_theme_button);
-        btnBack = view.findViewById(R.id.button_back);
+        Button btnApply = view.findViewById(R.id.apply_theme_button);
+        ImageView btnBack = view.findViewById(R.id.button_back);
 
-        btnApply.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (mThemeItem != null) {
-                    Bundle bundle = new Bundle();
-                    bundle.putString("package", mThemeItem.getPackageName());
-                    bundle.putBoolean("ringtone", mThemeTargetMap.get("ringtone"));
-                    bundle.putBoolean("alarm", mThemeTargetMap.get("alarm"));
-                    bundle.putBoolean("notification", mThemeTargetMap.get("notification"));
-                    bundle.putBoolean("wallpaper", mThemeTargetMap.get("wallpaper"));
-                    bundle.putBoolean("lockscreen", mThemeTargetMap.get("lockscreen"));
+        btnApply.setOnClickListener(v -> {
+            if (mThemeItem != null) {
+                Bundle bundle = new Bundle();
+                bundle.putString("package", mThemeItem.getPackageName());
+                bundle.putBoolean("ringtone", mThemeTargetMap.get("ringtone"));
+                bundle.putBoolean("alarm", mThemeTargetMap.get("alarm"));
+                bundle.putBoolean("notification", mThemeTargetMap.get("notification"));
+                bundle.putBoolean("wallpaper", mThemeTargetMap.get("wallpaper"));
+                bundle.putBoolean("lockscreen", mThemeTargetMap.get("lockscreen"));
 
-                    ArrayList<String> whiteList = new ArrayList<>();
-                    for (Map.Entry<String, Boolean> entry : mThemeTargetMap.entrySet()) {
-                        String key = entry.getKey();
-                        if (!entry.getValue() && !key.equals("wallpaper") && !key.equals("lockscreen")
-                                && !key.equals("ringtone") && !key.equals("alarm") && !key.equals("notification")) {
-                            whiteList.add(key);
-                        }
+                ArrayList<String> whiteList = new ArrayList<>();
+                for (Map.Entry<String, Boolean> entry : mThemeTargetMap.entrySet()) {
+                    String key = entry.getKey();
+                    if (!entry.getValue() && !key.equals("wallpaper") && !key.equals("lockscreen")
+                            && !key.equals("ringtone") && !key.equals("alarm") && !key.equals("notification")) {
+                        whiteList.add(key);
                     }
-                    bundle.putStringArrayList("whitelist", whiteList);
-                    mCallback.applyTheme(bundle);
-                } else if (mThemeAccent != null) {
-                    Bundle bundle = new Bundle();
-                    bundle.putString("package", mThemeAccent.getPackageName());
-                    bundle.putStringArrayList("whitelist", new ArrayList<>());
-                    mCallback.applyTheme(bundle);
                 }
-
+                bundle.putStringArrayList("whitelist", whiteList);
+                mCallback.applyTheme(bundle);
+            } else if (mThemeAccent != null) {
+                Bundle bundle = new Bundle();
+                bundle.putString("package", mThemeAccent.getPackageName());
+                bundle.putStringArrayList("whitelist", new ArrayList<>());
+                mCallback.applyTheme(bundle);
             }
+
         });
 
-        btnBack.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                getActivity().onBackPressed();
-            }
-        });
+        btnBack.setOnClickListener(v -> getActivity().onBackPressed());
 
-        imagePreviewViewer.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                imagePreviewViewer.setVisibility(View.GONE);
-            }
-        });
+        imagePreviewViewer.setOnClickListener(v -> imagePreviewViewer.setVisibility(View.GONE));
 
         return view;
     }
@@ -183,10 +168,10 @@ public class ThemePreviewFragment extends Fragment {
 
         // wallpaper
         if (mThemeItem.hasWallpaper()) {
-            addSwitch(wallpaperLayout, "wallpaper", R.string.background_wallpaper, true, true);
+            addSwitch(wallpaperLayout, "wallpaper", R.string.background_wallpaper);
         }
         if (mThemeItem.hasLockScreen()) {
-            addSwitch(wallpaperLayout, "lockscreen", R.string.background_lockscreen, true, true);
+            addSwitch(wallpaperLayout, "lockscreen", R.string.background_lockscreen);
         }
 
         if (!mThemeItem.hasWallpaper() && !mThemeItem.hasLockScreen()) {
@@ -195,13 +180,13 @@ public class ThemePreviewFragment extends Fragment {
 
         // sound
         if (mThemeItem.hasRingtone()) {
-            addSwitch(soundLayout, "ringtone", R.string.sound_ringtone, true, true);
+            addSwitch(soundLayout, "ringtone", R.string.sound_ringtone);
         }
         if (mThemeItem.hasAlarmSound()) {
-            addSwitch(soundLayout, "alarm", R.string.sound_alarm, true, true);
+            addSwitch(soundLayout, "alarm", R.string.sound_alarm);
         }
         if (mThemeItem.hasNotificationSound()) {
-            addSwitch(soundLayout, "notification", R.string.sound_notification, true, true);
+            addSwitch(soundLayout, "notification", R.string.sound_notification);
         }
 
         if (!mThemeItem.hasRingtone() && !mThemeItem.hasAlarmSound() && !mThemeItem.hasNotificationSound()) {
@@ -211,7 +196,7 @@ public class ThemePreviewFragment extends Fragment {
         // apps
         if (mThemeItem.hasOverlays()) {
             for (OverlayTarget overlayTarget : mThemeItem.getOverlayTargets()) {
-                addSwitch(appLayout, overlayTarget.getPackageName(), overlayTarget.getLabel(), true, overlayTarget.getSwitchable());
+                addSwitch(appLayout, overlayTarget.getPackageName(), overlayTarget.getLabel(), overlayTarget.getSwitchable());
             }
         } else {
             appLayout.setVisibility(View.GONE);
@@ -239,11 +224,11 @@ public class ThemePreviewFragment extends Fragment {
         mThemeTargetMap.put("android", true);
     }
 
-    private void addSwitch(LinearLayout layout, final String id, int text, boolean defaultValue, boolean enabled) {
-        addSwitch(layout, id, getString(text), defaultValue, enabled);
+    private void addSwitch(LinearLayout layout, final String id, int text) {
+        addSwitch(layout, id, getString(text), true);
     }
 
-    private void addSwitch(LinearLayout layout, final String id, String text, boolean defaultValue, boolean enabled) {
+    private void addSwitch(LinearLayout layout, final String id, String text, boolean enabled) {
         int paddingTop = getResources().getDimensionPixelOffset(R.dimen.picker_switch_padding_top);
         int paddingBottom = getResources().getDimensionPixelOffset(R.dimen.picker_switch_padding_bottom);
         int paddingLeft = getResources().getDimensionPixelOffset(R.dimen.picker_switch_padding_left);
@@ -252,16 +237,11 @@ public class ThemePreviewFragment extends Fragment {
         Switch tmpSwitch = new Switch(view.getContext());
 
         tmpSwitch.setText(text);
-        tmpSwitch.setChecked(defaultValue);
+        tmpSwitch.setChecked(true);
         tmpSwitch.setPadding(paddingLeft, paddingTop, paddingRight, paddingBottom);
-        mThemeTargetMap.put(id, defaultValue);
+        mThemeTargetMap.put(id, true);
 
-        tmpSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-                mThemeTargetMap.put(id, b);
-            }
-        });
+        tmpSwitch.setOnCheckedChangeListener((compoundButton, b) -> mThemeTargetMap.put(id, b));
 
         tmpSwitch.setEnabled(enabled);
 
@@ -278,12 +258,9 @@ public class ThemePreviewFragment extends Fragment {
         imageView.setMaxHeight(imageHeight);
         imageView.setAdjustViewBounds(true);
 
-        imageView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                imagePreviewViewer.setImageDrawable(imageView.getDrawable());
-                imagePreviewViewer.setVisibility(View.VISIBLE);
-            }
+        imageView.setOnClickListener(v -> {
+            imagePreviewViewer.setImageDrawable(imageView.getDrawable());
+            imagePreviewViewer.setVisibility(View.VISIBLE);
         });
 
         previewPicLayout.addView(imageView);

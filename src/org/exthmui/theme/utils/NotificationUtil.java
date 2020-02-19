@@ -26,15 +26,15 @@ public class NotificationUtil {
 
     private static final String TAG = "NotificationUtil";
 
-    public static String CHANNEL_APPLY_STATUS = "apply_status";
+    public final static String CHANNEL_APPLY_STATUS = "apply_status";
 
-    public static int IMPORTANCE_DEFAULT = NotificationManager.IMPORTANCE_DEFAULT;
-    public static int IMPORTANCE_HIGH = NotificationManager.IMPORTANCE_HIGH;
-    public static int IMPORTANCE_LOW = NotificationManager.IMPORTANCE_LOW;
-    public static int IMPORTANCE_MIN = NotificationManager.IMPORTANCE_MIN;
-    public static int IMPORTANCE_MAX = NotificationManager.IMPORTANCE_MAX;
-    public static int IMPORTANCE_NONE = NotificationManager.IMPORTANCE_NONE;
-    public static int IMPORTANCE_UNSPECIFIED = NotificationManager.IMPORTANCE_UNSPECIFIED;
+    public final static int IMPORTANCE_DEFAULT = NotificationManager.IMPORTANCE_DEFAULT;
+    public final static int IMPORTANCE_HIGH = NotificationManager.IMPORTANCE_HIGH;
+    public final static int IMPORTANCE_LOW = NotificationManager.IMPORTANCE_LOW;
+    public final static int IMPORTANCE_MIN = NotificationManager.IMPORTANCE_MIN;
+    public final static int IMPORTANCE_MAX = NotificationManager.IMPORTANCE_MAX;
+    public final static int IMPORTANCE_NONE = NotificationManager.IMPORTANCE_NONE;
+    public final static int IMPORTANCE_UNSPECIFIED = NotificationManager.IMPORTANCE_UNSPECIFIED;
 
     public static void createNotificationChannel(Context context, String channelId, String channelName, int importance) {
         NotificationChannel channel = new NotificationChannel(channelId, channelName, importance);

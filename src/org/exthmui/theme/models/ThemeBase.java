@@ -19,7 +19,7 @@ package org.exthmui.theme.models;
 public class ThemeBase {
 
     private String mTitle;
-    private String mPackageName;
+    private final String mPackageName;
     private String mAuthor;
     private boolean mRemovable;
 

@@ -31,7 +31,6 @@ import android.os.IBinder;
 import android.util.DisplayMetrics;
 import android.util.Log;
 
-import org.exthmui.theme.R;
 import org.exthmui.theme.models.OverlayTarget;
 import org.exthmui.theme.models.ThemeAccent;
 import org.exthmui.theme.models.ThemeBase;
@@ -50,9 +49,6 @@ public class ThemeDataService extends Service {
 
     private PackageManager mPackageManager;
     private List<ThemeBase> mThemeBaseList;
-
-    public ThemeDataService() {
-    }
 
     @Override
     public IBinder onBind(Intent intent) {

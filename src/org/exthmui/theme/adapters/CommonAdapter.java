@@ -33,9 +33,9 @@ import java.util.List;
 public abstract class CommonAdapter<T> extends BaseAdapter {
 
     private List<T> mData;
-    private int mLayoutRes;     //布局id
+    private final int mLayoutRes;     //布局id
 
-    public CommonAdapter(List<T> data, int layoutRes) {
+    protected CommonAdapter(List<T> data, int layoutRes) {
         mData = data;
         mLayoutRes = layoutRes;
     }
@@ -62,7 +62,7 @@ public abstract class CommonAdapter<T> extends BaseAdapter {
         return holder.getItemView();
     }
 
-    public abstract void bindView(ViewHolder holder, T obj);
+    protected abstract void bindView(ViewHolder holder, T obj);
 
     //添加一个元素
     public void add(T data) {
@@ -106,15 +106,13 @@ public abstract class CommonAdapter<T> extends BaseAdapter {
 
     public static class ViewHolder<T> {
 
-        private SparseArray<View> mViews;   //存储ListView 的 item中的View
+        private final SparseArray<View> mViews;   //存储ListView 的 item中的View
         private View item;                  //存放convertView
         private int position;               //游标
-        private Context context;            //Context上下文
 
         //构造方法，完成相关初始化
         private ViewHolder(Context context, ViewGroup parent, int layoutRes) {
             mViews = new SparseArray<>();
-            this.context = context;
             View convertView = LayoutInflater.from(context).inflate(layoutRes, parent, false);
             convertView.setTag(this);
             item = convertView;

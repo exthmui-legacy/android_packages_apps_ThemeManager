@@ -30,7 +30,7 @@ public class ThemeStatusReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        String msg = "";
+        String msg;
         int max = 0, progress = 0;
         boolean indeterminate = false;
         int notificationId = intent.getStringExtra("themePackage").hashCode();

@@ -43,7 +43,6 @@ public class ThemePickerFragment extends Fragment {
 
     private ThemeAdapter mThemeAdapter;
     private ThemePickerInterface mCallback;
-    private View view;
     private GridView mGridView;
 
     public static ThemePickerFragment newInstance() {
@@ -62,24 +61,14 @@ public class ThemePickerFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
-        view = inflater.inflate(R.layout.theme_picker_fragment, container, false);
+        View view = inflater.inflate(R.layout.theme_picker_fragment, container, false);
         mGridView = view.findViewById(R.id.themesGrid);
 
         int cardWidth = getResources().getDimensionPixelOffset(R.dimen.card_image_height) / 16 * 10;
         mGridView.setNumColumns(getResources().getDisplayMetrics().widthPixels / cardWidth);
-        mGridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                mCallback.onThemeItemClick(parent, view, position, id);
-            }
-        });
+        mGridView.setOnItemClickListener((parent, view1, position, id) -> mCallback.onThemeItemClick(parent, view1, position, id));
 
-        mGridView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-            @Override
-            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-                return mCallback.onThemeItemLongClick(parent, view, position, id);
-            }
-        });
+        mGridView.setOnItemLongClickListener((parent, view12, position, id) -> mCallback.onThemeItemLongClick(parent, view12, position, id));
 
         return view;
     }
@@ -103,28 +92,17 @@ public class ThemePickerFragment extends Fragment {
         @Override
         public void bindView(ViewHolder holder, ThemeBase obj) {
             holder.setImageResource(R.id.theme_card_image, R.drawable.theme_default_src);
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    if (obj instanceof ThemeAccent) {
-                        getActivity().runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                holder.setImageResource(R.id.theme_card_image, R.drawable.theme_accent_image);
-                                holder.setBackgroundColor(R.id.theme_card_image, ((ThemeAccent) obj).getAccentColor());
-                            }
-                        });
-                    } else {
-                        Drawable drawable =  mCallback.getThemeImage(obj.getPackageName());
-                        getActivity().runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                holder.setImageResource(R.id.theme_card_image, drawable);
-                            }
-                        });
-                    }
-
+            new Thread(() -> {
+                if (obj instanceof ThemeAccent) {
+                    getActivity().runOnUiThread(() -> {
+                        holder.setImageResource(R.id.theme_card_image, R.drawable.theme_accent_image);
+                        holder.setBackgroundColor(R.id.theme_card_image, ((ThemeAccent) obj).getAccentColor());
+                    });
+                } else {
+                    Drawable drawable =  mCallback.getThemeImage(obj.getPackageName());
+                    getActivity().runOnUiThread(() -> holder.setImageResource(R.id.theme_card_image, drawable));
                 }
+
             }).start();
 
             holder.setText(R.id.theme_card_title, obj.getTitle());

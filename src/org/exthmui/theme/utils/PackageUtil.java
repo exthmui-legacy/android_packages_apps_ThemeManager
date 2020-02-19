@@ -66,7 +66,7 @@ public class PackageUtil {
             OutputStream outputStream = session.openWrite(installId, 0, -1);
 
             byte[] buffer = new byte[65536];
-            int tmpByte = -1;
+            int tmpByte;
 
             while ((tmpByte = inputStream.read(buffer)) != -1) {
                 outputStream.write(buffer, 0, tmpByte);

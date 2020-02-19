@@ -18,10 +18,6 @@
     <dimen name="select_grid_padding_top">16.0dip</dimen>
     <dimen name="select_grid_vertical_spacing">8.0dip</dimen>
 
-    <dimen name="skin_item_icon_height">60.0dip</dimen>
-    <dimen name="skin_item_icon_width">60.0dip</dimen>
-
-    <dimen name="picker_actionbar_content_inset_start">16.0dip</dimen>
     <dimen name="picker_actionbar_icon_shadow_alpha">0.2</dimen>
 
     <dimen name="picker_activity_padding_end">16.0dip</dimen>

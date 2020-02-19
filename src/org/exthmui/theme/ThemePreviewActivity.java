@@ -43,10 +43,8 @@ public class ThemePreviewActivity extends FragmentActivity implements ThemePrevi
 
     private ThemeDataService.ThemeDataBinder mThemeDataBinder;
     private ThemeDataConn mThemeDataConn;
-    private Intent mThemeDataService;
     private ThemeManageService.ThemeManageBinder mThemeManageBinder;
     private ThemeManageConn mThemeManageConn;
-    private Intent mThemeManageService;
 
     private String mThemePackageName;
     private ThemePreviewFragment mFragment;
@@ -69,9 +67,9 @@ public class ThemePreviewActivity extends FragmentActivity implements ThemePrevi
             mApplyingDialog = new ThemeApplyingDialog();
         }
 
-        mThemeDataService = new Intent(this, ThemeDataService.class);
+        Intent mThemeDataService = new Intent(this, ThemeDataService.class);
         mThemeDataConn = new ThemeDataConn();
-        mThemeManageService = new Intent(this, ThemeManageService.class);
+        Intent mThemeManageService = new Intent(this, ThemeManageService.class);
         mThemeManageConn = new ThemeManageConn();
         bindService(mThemeDataService, mThemeDataConn, Context.BIND_AUTO_CREATE);
         bindService(mThemeManageService, mThemeManageConn, Context.BIND_AUTO_CREATE);
@@ -117,14 +115,11 @@ public class ThemePreviewActivity extends FragmentActivity implements ThemePrevi
     @Override
     public void applyTheme(Bundle bundle) {
         mApplyingDialog.show(getSupportFragmentManager(), TAG);
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                if (mThemeItem != null) {
-                    mThemeManageBinder.applyTheme(mThemeItem, bundle);
-                } else if (mThemeAccent != null) {
-                    mThemeManageBinder.applyThemeAccent(mThemeAccent, bundle);
-                }
+        new Thread(() -> {
+            if (mThemeItem != null) {
+                mThemeManageBinder.applyTheme(mThemeItem, bundle);
+            } else if (mThemeAccent != null) {
+                mThemeManageBinder.applyThemeAccent(mThemeAccent, bundle);
             }
         }).start();
     }
@@ -151,18 +146,15 @@ public class ThemePreviewActivity extends FragmentActivity implements ThemePrevi
         @Override
         public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
             mThemeManageBinder = (ThemeManageService.ThemeManageBinder) iBinder;
-            mThemeManageBinder.setThemeApplyStatusListener(new ThemeManageService.ThemeApplyStatusListener() {
-                @Override
-                public void update(Intent data) {
-                    if (mFragment == null || mApplyingDialog == null) return;
-                    sendBroadcast(data);
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            mApplyingDialog.updateData(data);
-                        }
-                    });
-                }
+            mThemeManageBinder.setThemeApplyStatusListener(data -> {
+                if (mFragment == null || mApplyingDialog == null) return;
+                sendBroadcast(data);
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        mApplyingDialog.updateData(data);
+                    }
+                });
             });
         }
 

@@ -18,6 +18,7 @@ package org.exthmui.theme.fragments;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -37,30 +38,21 @@ public class ThemeApplyingDialog extends DialogFragment {
     private static final String TAG = "ThemeApplyingDialog";
 
     private Bundle dialogData = new Bundle();
-    private View rootView;
     private TextView textApplying;
     private ProgressBar progApplying;
     private Button btnDismiss;
 
-    public ThemeApplyingDialog() {
-    }
-
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
         super.onCreateView(inflater, container, savedInstanceState);
-        rootView = inflater.inflate(R.layout.theme_applying_dialog, container, false);
+        View rootView = inflater.inflate(R.layout.theme_applying_dialog, container, false);
         textApplying = rootView.findViewById(R.id.applying_text);
         progApplying = rootView.findViewById(R.id.applying_prog);
         btnDismiss = rootView.findViewById(R.id.dismiss_button);
         btnDismiss.setText(android.R.string.ok);
-        btnDismiss.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                dismiss();
-            }
-        });
+        btnDismiss.setOnClickListener(v -> dismiss());
 
         return rootView;
     }
@@ -77,7 +69,7 @@ public class ThemeApplyingDialog extends DialogFragment {
     }
 
     @Override
-    public void onSaveInstanceState(Bundle outState) {
+    public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putBundle("data", dialogData);
     }
@@ -113,7 +105,7 @@ public class ThemeApplyingDialog extends DialogFragment {
 
     private void updateView() {
         String status = dialogData.getString("status", "ERROR");
-        String msg = "";
+        String msg;
         int max = 0, progress = 0;
         boolean indeterminate = true;
         switch (status) {
