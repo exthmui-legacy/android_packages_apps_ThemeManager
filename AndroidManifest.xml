@@ -20,6 +20,9 @@
     package="org.exthmui.theme"
     android:sharedUserId="android.uid.system">
 
+    <permission android:protectionLevel="normal" android:name="exthmui.permission.READ_THEME_DATA"></permission>
+    <permission android:protectionLevel="signature" android:name="exthmui.permission.MANAGE_THEME"></permission>
+
     <uses-permission android:name="android.permission.SET_WALLPAPER" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_SETTINGS" />
@@ -44,10 +47,12 @@
         <service
             android:name=".services.ThemeManageService"
             android:enabled="true"
+            android:permission="exthmui.permission.MANAGE_THEME"
             android:exported="true"/>
         <service
             android:name=".services.ThemeDataService"
             android:enabled="true"
+            android:permission="exthmui.permission.READ_THEME_DATA"
             android:exported="true"/>
 
         <activity android:name=".ThemePreviewActivity"
