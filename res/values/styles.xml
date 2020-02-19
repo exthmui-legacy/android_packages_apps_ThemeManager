@@ -39,11 +39,6 @@
         <item name="android:adjustViewBounds">true</item>
     </style>
 
-    <style name="item_skin_skinImageOverlay">
-        <item name="android:background">?android:selectableItemBackground</item>
-        <item name="android:scaleType">centerInside</item>
-    </style>
-
     <style name="skin_preview_layout">
         <item name="android:divider">@drawable/shape_divider</item>
         <item name="android:showDividers">middle|beginning|end</item>

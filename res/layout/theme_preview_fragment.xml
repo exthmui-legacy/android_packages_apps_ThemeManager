@@ -157,7 +157,7 @@
                 android:layout_width="@dimen/back_button_width"
                 android:layout_height="@dimen/back_button_height"
                 android:layout_margin="@dimen/button_margin"
-                android:background="@drawable/shape_btn_circle"
+                android:background="?android:selectableItemBackground"
                 android:contentDescription="@null"
                 android:src="@drawable/ic_back_arrow" />
         </FrameLayout>

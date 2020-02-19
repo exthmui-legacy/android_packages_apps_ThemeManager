@@ -1,15 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     style="@style/item_skin"
-    android:background="@drawable/ic_card_bg"
-    android:descendantFocusability="blocksDescendants">
+    android:background="@drawable/card_bg"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
 
-    <FrameLayout
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content">
-
+    <LinearLayout
+        android:background="?android:selectableItemBackground"
+        android:descendantFocusability="blocksDescendants"
+        android:orientation="vertical"
+        android:layout_height="match_parent"
+        android:layout_width="match_parent">
         <ImageView
             android:id="@+id/theme_card_image"
             style="@style/item_skin_skinImage"
@@ -17,21 +21,14 @@
             android:layout_height="@dimen/card_image_height"
             android:contentDescription="@null" />
 
-        <ImageView
-            style="@style/item_skin_skinImageOverlay"
-            android:layout_width="fill_parent"
-            android:layout_height="@dimen/card_image_height"
-            android:contentDescription="@null"
-            android:scaleType="centerInside" />
+        <TextView
+            android:id="@+id/theme_card_title"
+            style="@style/item_skin_skinTitle"
+            android:layout_gravity="bottom"
+            android:ellipsize="end"
+            android:lines="@integer/item_skin_title_max_rows"
+            android:maxLines="@integer/item_skin_title_max_rows" />
 
-    </FrameLayout>
+    </LinearLayout>
 
-    <TextView
-        android:id="@+id/theme_card_title"
-        style="@style/item_skin_skinTitle"
-        android:layout_gravity="bottom"
-        android:ellipsize="end"
-        android:lines="@integer/item_skin_title_max_rows"
-        android:maxLines="@integer/item_skin_title_max_rows" />
-
-</LinearLayout>
+</FrameLayout>
