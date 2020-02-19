@@ -128,7 +128,7 @@ public class ThemePreviewActivity extends FragmentActivity implements ThemePrevi
         @Override
         public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
             mThemeDataBinder = (ThemeDataService.ThemeDataBinder) iBinder;
-            if (mThemeDataBinder.isThemePackage(mThemePackageName)) {
+            if (getPackageName().equals(mThemePackageName) || mThemeDataBinder.isThemePackage(mThemePackageName)) {
                 mThemeItem = mThemeDataBinder.getThemeItem(mThemePackageName);
                 mFragment.setThemeItem(mThemeItem);
             } else if (mThemeDataBinder.isAccentColorPackage(mThemePackageName)) {

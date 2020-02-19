@@ -123,7 +123,6 @@ public class ThemeDataService extends Service {
 
     private boolean IsThemePackage(String packageName) {
         boolean ret = false;
-        if (getPackageName().equals(packageName)) return true;
         try {
             ApplicationInfo ai = mPackageManager.getApplicationInfo(packageName, PackageManager.GET_META_DATA);
             Bundle metadata = ai.metaData;
