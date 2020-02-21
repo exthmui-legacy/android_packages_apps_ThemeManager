@@ -179,7 +179,6 @@ public class ThemeManageService extends Service {
             setThemeApplyStatus(THEME_APPLYING, theme);
 
             IRemoveThemeOverlays(bundle);
-            Thread.sleep(1000);
 
             if (theme.hasRingtone() && bundle.getBoolean("ringtone")) {
                 setThemeApplyStatus(THEME_APPLYING_RINGTONE, theme);
@@ -242,8 +241,11 @@ public class ThemeManageService extends Service {
                                 return;
                             }
                             try {
+                                while (mOverlayService.getOverlayInfo(packageName, userId) == null) {
+                                    Thread.sleep(50);
+                                }
                                 mOverlayService.setEnabled(packageName, true, userId);
-                            } catch (RemoteException e) {
+                            } catch (Exception e) {
                                 Log.e(TAG, "Failed to enable overlay " + packageName);
                                 onFailure(packageName, 0);
                                 return;
@@ -273,7 +275,6 @@ public class ThemeManageService extends Service {
                     }
                 }
             }
-            Thread.sleep(1000);
 
         } catch (Exception e) {
             Log.e(TAG, "Failed to apply theme " + theme.getPackageName());
@@ -296,9 +297,7 @@ public class ThemeManageService extends Service {
         try {
             setThemeApplyStatus(THEME_APPLYING, theme);
             IRemoveThemeOverlays(bundle);
-            Thread.sleep(1000);
             mOverlayService.setEnabled(theme.getPackageName(), true, userId);
-            Thread.sleep(1000);
         } catch (Exception e) {
             Log.e(TAG, "Failed to apply theme " + theme.getPackageName());
             ret = false;
