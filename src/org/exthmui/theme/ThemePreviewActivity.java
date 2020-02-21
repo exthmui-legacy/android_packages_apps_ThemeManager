@@ -32,6 +32,7 @@ import android.util.Log;
 import org.exthmui.theme.fragments.ThemeApplyingDialog;
 import org.exthmui.theme.fragments.ThemePreviewFragment;
 import org.exthmui.theme.interfaces.ThemePreviewInterface;
+import org.exthmui.theme.misc.Constants;
 import org.exthmui.theme.models.ThemeAccent;
 import org.exthmui.theme.models.ThemeItem;
 import org.exthmui.theme.services.ThemeDataService;
@@ -121,7 +122,7 @@ public class ThemePreviewActivity extends FragmentActivity implements ThemePrevi
     @Override
     public void applyTheme(Bundle bundle) {
         mApplyingDialog.show(getSupportFragmentManager(), TAG);
-        bundle.putBoolean("uninstall", mPreferences.getBoolean("overlay_uninstall_flag", false));
+        bundle.putBoolean(Constants.PREFERENCES_OVERLAY_REMOVE_FLAG, mPreferences.getBoolean(Constants.PREFERENCES_OVERLAY_REMOVE_FLAG, false));
         new Thread(() -> {
             if (mThemeItem != null) {
                 mThemeManageBinder.applyTheme(mThemeItem, bundle);

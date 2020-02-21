@@ -26,8 +26,6 @@ public class NotificationUtil {
 
     private static final String TAG = "NotificationUtil";
 
-    public final static String CHANNEL_APPLY_STATUS = "apply_status";
-
     public final static int IMPORTANCE_DEFAULT = NotificationManager.IMPORTANCE_DEFAULT;
     public final static int IMPORTANCE_HIGH = NotificationManager.IMPORTANCE_HIGH;
     public final static int IMPORTANCE_LOW = NotificationManager.IMPORTANCE_LOW;

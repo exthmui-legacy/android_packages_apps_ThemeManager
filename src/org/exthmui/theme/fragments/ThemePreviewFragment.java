@@ -34,6 +34,7 @@ import android.widget.TextView;
 
 import org.exthmui.theme.R;
 import org.exthmui.theme.interfaces.ThemePreviewInterface;
+import org.exthmui.theme.misc.Constants;
 import org.exthmui.theme.models.OverlayTarget;
 import org.exthmui.theme.models.ThemeAccent;
 import org.exthmui.theme.models.ThemeBase;
@@ -106,7 +107,7 @@ public class ThemePreviewFragment extends Fragment {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
     }
-    
+
     public void setThemeItem(ThemeItem themeItem) {
         mThemeItem = themeItem;
         updateThemeBase(mThemeItem);
@@ -130,10 +131,10 @@ public class ThemePreviewFragment extends Fragment {
 
         // wallpaper
         if (mThemeItem.hasWallpaper()) {
-            addSwitch(wallpaperLayout, "theme.wallpaper", R.string.background_wallpaper);
+            addSwitch(wallpaperLayout, Constants.THEME_TARGET_WALLPAPER, R.string.background_wallpaper);
         }
         if (mThemeItem.hasLockScreen()) {
-            addSwitch(wallpaperLayout, "theme.lockscreen", R.string.background_lockscreen);
+            addSwitch(wallpaperLayout, Constants.THEME_TARGET_LOCKSCREEN, R.string.background_lockscreen);
         }
 
         if (!mThemeItem.hasWallpaper() && !mThemeItem.hasLockScreen()) {
@@ -142,13 +143,13 @@ public class ThemePreviewFragment extends Fragment {
 
         // sound
         if (mThemeItem.hasRingtone()) {
-            addSwitch(soundLayout, "theme.ringtone", R.string.sound_ringtone);
+            addSwitch(soundLayout, Constants.THEME_TARGET_RINGTONE, R.string.sound_ringtone);
         }
         if (mThemeItem.hasAlarmSound()) {
-            addSwitch(soundLayout, "theme.alarm", R.string.sound_alarm);
+            addSwitch(soundLayout, Constants.THEME_TARGET_ALARM, R.string.sound_alarm);
         }
         if (mThemeItem.hasNotificationSound()) {
-            addSwitch(soundLayout, "theme.notification", R.string.sound_notification);
+            addSwitch(soundLayout, Constants.THEME_TARGET_NOTIFICATION, R.string.sound_notification);
         }
 
         if (!mThemeItem.hasRingtone() && !mThemeItem.hasAlarmSound() && !mThemeItem.hasNotificationSound()) {

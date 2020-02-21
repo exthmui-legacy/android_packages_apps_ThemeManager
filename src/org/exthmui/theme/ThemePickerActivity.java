@@ -40,6 +40,7 @@ import android.widget.Switch;
 
 import org.exthmui.theme.fragments.ThemePickerFragment;
 import org.exthmui.theme.interfaces.ThemePickerInterface;
+import org.exthmui.theme.misc.Constants;
 import org.exthmui.theme.models.ThemeBase;
 import org.exthmui.theme.services.ThemeDataService;
 import org.exthmui.theme.services.ThemeManageService;
@@ -67,7 +68,7 @@ public class ThemePickerActivity extends FragmentActivity implements ThemePicker
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.theme_picker_activity);
-        NotificationUtil.createNotificationChannel(this, NotificationUtil.CHANNEL_APPLY_STATUS, getString(R.string.channel_apply_status), NotificationUtil.IMPORTANCE_DEFAULT);
+        NotificationUtil.createNotificationChannel(this, Constants.CHANNEL_APPLY_STATUS, getString(R.string.channel_apply_status), NotificationUtil.IMPORTANCE_DEFAULT);
         PermissionUtil.verifyStoragePermission(this);
         PermissionUtil.verifyWriteSettingsPermission(this);
 
@@ -157,7 +158,7 @@ public class ThemePickerActivity extends FragmentActivity implements ThemePicker
 
     @Override
     public void updateThemeList() {
-        mThemeDataBinder.updateThemeList(mPreferences.getBoolean("list_accents", true));
+        mThemeDataBinder.updateThemeList(mPreferences.getBoolean(Constants.PREFERENCES_LIST_ACCENT_PACKAGES, true));
     }
 
     @Override
@@ -183,17 +184,17 @@ public class ThemePickerActivity extends FragmentActivity implements ThemePicker
         Switch listAccentPackages = view.findViewById(R.id.preferences_list_accent_packages);
         Switch overlayUninstallFlag = view.findViewById(R.id.preferences_overlay_uninstall_flag);
 
-        listAccentPackages.setChecked(mPreferences.getBoolean("list_accents", true));
-        overlayUninstallFlag.setChecked(mPreferences.getBoolean("overlay_uninstall_flag", false));
+        listAccentPackages.setChecked(mPreferences.getBoolean(Constants.PREFERENCES_LIST_ACCENT_PACKAGES, true));
+        overlayUninstallFlag.setChecked(mPreferences.getBoolean(Constants.PREFERENCES_OVERLAY_REMOVE_FLAG, false));
 
         new AlertDialog.Builder(this)
                 .setTitle(R.string.menu_preferences)
                 .setView(view)
                 .setOnDismissListener(dialogInterface -> {
                     mPreferences.edit()
-                            .putBoolean("list_accents",
+                            .putBoolean(Constants.PREFERENCES_LIST_ACCENT_PACKAGES,
                                     listAccentPackages.isChecked())
-                            .putBoolean("overlay_uninstall_flag",
+                            .putBoolean(Constants.PREFERENCES_OVERLAY_REMOVE_FLAG,
                                     overlayUninstallFlag.isChecked())
                             .apply();
                     new Thread(() -> {

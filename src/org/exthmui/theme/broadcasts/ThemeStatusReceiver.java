@@ -21,7 +21,7 @@ import android.content.Context;
 import android.content.Intent;
 
 import org.exthmui.theme.R;
-import org.exthmui.theme.services.ThemeManageService;
+import org.exthmui.theme.misc.Constants;
 import org.exthmui.theme.utils.NotificationUtil;
 
 public class ThemeStatusReceiver extends BroadcastReceiver {
@@ -37,14 +37,14 @@ public class ThemeStatusReceiver extends BroadcastReceiver {
         String themeTitle = intent.getStringExtra("themeTitle");
 
         switch (intent.getStringExtra("status")) {
-            case ThemeManageService.THEME_APPLYING:
+            case Constants.THEME_APPLYING:
                 msg = context.getString(R.string.skin_apply_status_running);
                 indeterminate = true;
                 break;
-            case ThemeManageService.THEME_APPLY_SUCCEED:
+            case Constants.THEME_APPLY_SUCCEED:
                 msg = context.getString(R.string.skin_apply_status_succeed, themeTitle);
                 break;
-            case ThemeManageService.THEME_APPLY_FAILED:
+            case Constants.THEME_APPLY_FAILED:
                 msg = context.getString(R.string.skin_apply_status_failed, themeTitle);
                 break;
             default:
@@ -53,7 +53,7 @@ public class ThemeStatusReceiver extends BroadcastReceiver {
 
         NotificationUtil.showNotification(
                 context, null,
-                NotificationUtil.CHANNEL_APPLY_STATUS, notificationId,
+                Constants.CHANNEL_APPLY_STATUS, notificationId,
                 msg, null, R.drawable.ic_stat_notification,
                 max, progress, indeterminate);
     }

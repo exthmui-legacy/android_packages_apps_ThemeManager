@@ -31,6 +31,7 @@ import android.os.IBinder;
 import android.util.DisplayMetrics;
 import android.util.Log;
 
+import org.exthmui.theme.misc.Constants;
 import org.exthmui.theme.models.OverlayTarget;
 import org.exthmui.theme.models.ThemeAccent;
 import org.exthmui.theme.models.ThemeBase;
@@ -121,7 +122,7 @@ public class ThemeDataService extends Service {
             ApplicationInfo ai = mPackageManager.getApplicationInfo(packageName, PackageManager.GET_META_DATA);
             Bundle metadata = ai.metaData;
             if (metadata != null) {
-                ret = metadata.getBoolean("exthmui_theme",false);
+                ret = metadata.getBoolean(Constants.THEME_DATA_FLAG,false);
             }
         } catch (Exception e) {
             Log.e(TAG, "check package " + packageName + " failed");
@@ -135,7 +136,7 @@ public class ThemeDataService extends Service {
             ApplicationInfo ai = mPackageManager.getApplicationInfo(packageName, PackageManager.GET_META_DATA);
             Bundle metadata = ai.metaData;
             if (metadata != null) {
-                ret = metadata.getInt("lineage_berry_accent_preview",0) != 0;
+                ret = metadata.getInt(Constants.THEME_DATA_ACCENT_COLOR,0) != 0;
             }
         } catch (Exception e) {
             Log.e(TAG, "check package " + packageName + " failed");
@@ -146,7 +147,7 @@ public class ThemeDataService extends Service {
     private Drawable IGetThemeBanner(String packageName) {
         try {
             Resources resources = mPackageManager.getResourcesForApplication(packageName);
-            int bannerResId = resources.getIdentifier("theme_banner", "drawable", packageName);
+            int bannerResId = resources.getIdentifier(Constants.THEME_DATA_BANNER, "drawable", packageName);
             return resources.getDrawable(bannerResId, null);
         } catch (Exception e) {
             Log.e(TAG, "Failed to get banner of " + packageName);
@@ -157,7 +158,7 @@ public class ThemeDataService extends Service {
     private Drawable IGetThemeImage(String packageName) {
         try {
             Resources resources = mPackageManager.getResourcesForApplication(packageName);
-            int imageResId = resources.getIdentifier("theme_image", "drawable", packageName);
+            int imageResId = resources.getIdentifier(Constants.THEME_DATA_IMAGE, "drawable", packageName);
             return resources.getDrawable(imageResId, null);
         } catch (Exception e) {
             Log.e(TAG, "Failed to get image of " + packageName);
@@ -172,10 +173,10 @@ public class ThemeDataService extends Service {
             Resources resources = mPackageManager.getResourcesForApplication(packageName);
             AssetManager assetManager = resources.getAssets();
 
-            String[] previewsArray = assetManager.list("previews");
+            String[] previewsArray = assetManager.list(Constants.THEME_DATA_ASSETS_PREVIEWS);
             if (previewsArray != null) {
                 for (String preview : previewsArray) {
-                    InputStream inputStream = assetManager.open("previews/" + preview);
+                    InputStream inputStream = assetManager.open(Constants.THEME_DATA_ASSETS_PREVIEWS + "/" + preview);
                     Drawable drawable = Drawable.createFromStream(inputStream, preview);
                     previewList.add(drawable);
                 }
@@ -205,8 +206,8 @@ public class ThemeDataService extends Service {
         try {
             Resources resources = mPackageManager.getResourcesForApplication(packageName);
             ApplicationInfo ai = mPackageManager.getApplicationInfo(packageName, PackageManager.GET_META_DATA);
-            int themeTitleResId = resources.getIdentifier("theme_title", "string", packageName);
-            int themeAuthorResId = resources.getIdentifier("theme_author", "string", packageName);
+            int themeTitleResId = resources.getIdentifier(Constants.THEME_DATA_TITLE, "string", packageName);
+            int themeAuthorResId = resources.getIdentifier(Constants.THEME_DATA_AUTHOR, "string", packageName);
 
             themeBase.setTitle(resources.getString(themeTitleResId));
             themeBase.setAuthor(resources.getString(themeAuthorResId));
@@ -222,8 +223,8 @@ public class ThemeDataService extends Service {
             ThemeAccent themeAccent = new ThemeAccent(packageName);
 
             themeAccent.setTitle(ai.loadLabel(mPackageManager).toString());
-            themeAccent.setAuthor("LineageOS");
-            themeAccent.setAccentColor(ai.metaData.getInt("lineage_berry_accent_preview",0));
+            themeAccent.setAuthor(Constants.THEME_DATA_ACCENT_AUTHOR);
+            themeAccent.setAccentColor(ai.metaData.getInt(Constants.THEME_DATA_ACCENT_COLOR,0));
             themeAccent.setRemovable((ai.flags & ApplicationInfo.FLAG_SYSTEM) != 0);
             return themeAccent;
         } catch (Exception e) {
@@ -242,7 +243,7 @@ public class ThemeDataService extends Service {
             Stack<String> xmlTags = new Stack<>();
             Map<String, Integer> attrMap = new HashMap<>();
             List<OverlayTarget> overlayTargetList = new ArrayList<>();
-            int themeInfoXmlResId = resources.getIdentifier("theme_data", "xml", packageName);
+            int themeInfoXmlResId = resources.getIdentifier(Constants.THEME_DATA_XML_FILE, "xml", packageName);
             XmlResourceParser themeInfoXml = resources.getXml(themeInfoXmlResId);
             int eventType = themeInfoXml.getEventType();
             boolean overlaySwitchable = true;
@@ -252,19 +253,19 @@ public class ThemeDataService extends Service {
                     case XmlResourceParser.START_TAG:
                         xmlTags.push(themeInfoXml.getName().toLowerCase());
                         switch (xmlTags.peek()) {
-                            case "overlay":
+                            case Constants.THEME_DATA_XML_OVERLAY:
                                 overlayTargetList.clear();
                                 break;
-                            case "target":
+                            case Constants.THEME_DATA_XML_OVERLAY_TARGET:
                                 overlaySwitchable = true;
                                 for (int i = 0; i < themeInfoXml.getAttributeCount(); i++) {
-                                    if (themeInfoXml.getAttributeName(i).equals("switchable")) {
+                                    if (themeInfoXml.getAttributeName(i).equals(Constants.THEME_DATA_XML_OVERLAY_TARGET_ATTR_SWITCHABLE)) {
                                         overlaySwitchable = themeInfoXml.getAttributeBooleanValue(i, true);
                                         break;
                                     }
                                 }
                                 break;
-                            case "wallpaper": case "lockscreen":
+                            case Constants.THEME_DATA_XML_BACKGROUND_WALLPAPER: case Constants.THEME_DATA_XML_BACKGROUND_LOCKSCREEN:
                                 attrMap.clear();
                                 for (int i = 0; i < themeInfoXml.getAttributeCount(); i++) {
                                     attrMap.put(themeInfoXml.getAttributeName(i), themeInfoXml.getAttributeIntValue(i, -1));
@@ -275,32 +276,32 @@ public class ThemeDataService extends Service {
                     case XmlResourceParser.TEXT:
                         switch (xmlTags.peek()) {
                             // sounds
-                            case "ringtone":
+                            case Constants.THEME_DATA_XML_SOUND_RINGTONE:
                                 theme.setRingtone(themeInfoXml.getText());
                                 break;
-                            case "alarm":
+                            case Constants.THEME_DATA_XML_SOUND_ALARM:
                                 theme.setAlarmSound(themeInfoXml.getText());
                                 break;
-                            case "notification":
+                            case Constants.THEME_DATA_XML_SOUND_NOTIFICATION:
                                 theme.setNotificationSound(themeInfoXml.getText());
                                 break;
 
                             // background
-                            case "wallpaper":
+                            case Constants.THEME_DATA_XML_BACKGROUND_WALLPAPER:
                                 if ((attrMap.isEmpty() && !theme.hasWallpaper()) ||
-                                        (displayMetrics.widthPixels / attrMap.getOrDefault("ratioX", 1) == displayMetrics.heightPixels / attrMap.getOrDefault("ratioY", 1))) {
+                                        (displayMetrics.widthPixels / attrMap.getOrDefault(Constants.THEME_DATA_XML_BACKGROUND_RATIO_WIDTH, 1) == displayMetrics.heightPixels / attrMap.getOrDefault(Constants.THEME_DATA_XML_BACKGROUND_RATIO_HEIGHT, 1))) {
                                     theme.setWallpaper(themeInfoXml.getText());
                                 }
                                 break;
-                            case "lockscreen":
+                            case Constants.THEME_DATA_XML_BACKGROUND_LOCKSCREEN:
                                 if ((attrMap.isEmpty() && !theme.hasLockScreen()) ||
-                                        (displayMetrics.widthPixels / attrMap.getOrDefault("ratioX", 1) == displayMetrics.heightPixels / attrMap.getOrDefault("ratioY", 1))) {
+                                        (displayMetrics.widthPixels / attrMap.getOrDefault(Constants.THEME_DATA_XML_BACKGROUND_RATIO_WIDTH, 1) == displayMetrics.heightPixels / attrMap.getOrDefault(Constants.THEME_DATA_XML_BACKGROUND_RATIO_HEIGHT, 1))) {
                                     theme.setLockScreen(themeInfoXml.getText());
                                 }
                                 break;
 
                             // overlay
-                            case "target":
+                            case Constants.THEME_DATA_XML_OVERLAY_TARGET:
                                 OverlayTarget ovt = getOverlayTarget(themeInfoXml.getText());
                                 if (ovt != null) {
                                     ovt.setSwitchable(overlaySwitchable);

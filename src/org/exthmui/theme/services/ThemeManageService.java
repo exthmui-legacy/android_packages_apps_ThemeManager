@@ -33,6 +33,7 @@ import android.os.ServiceManager;
 import android.os.UserHandle;
 import android.util.Log;
 
+import org.exthmui.theme.misc.Constants;
 import org.exthmui.theme.models.OverlayTarget;
 import org.exthmui.theme.models.ThemeAccent;
 import org.exthmui.theme.models.ThemeBase;
@@ -51,17 +52,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class ThemeManageService extends Service {
 
     private final static String TAG = "ThemeManageService";
-
-    public final static String BROADCAST_ACTION_APPLY_RESULT = "org.exthmui.theme.THEME_APPLY_RESULT";
-    public final static String THEME_APPLY_SUCCEED = "APPLY_SUCCEED";
-    public final static String THEME_APPLY_FAILED = "APPLY_FAILED";
-    public final static String THEME_APPLYING = "APPLYING";
-    public final static String THEME_APPLYING_RINGTONE = "APPLYING_RINGTONE";
-    public final static String THEME_APPLYING_ALARM = "APPLYING_ALARM";
-    public final static String THEME_APPLYING_NOTIFICATION = "APPLYING_NOTIFICATION";
-    public final static String THEME_APPLYING_WALLPAPER = "APPLYING_WALLPAPER";
-    public final static String THEME_APPLYING_LOCKSCREEN = "APPLYING_LOCKSCREEN";
-    public final static String THEME_APPLYING_OVERLAY = "APPLYING_OVERLAY";
 
     private IOverlayManager mOverlayService;
     private PackageManager mPackageManager;
@@ -108,7 +98,7 @@ public class ThemeManageService extends Service {
         List<PackageInfo> allPackages = mPackageManager.getInstalledPackages(0);
         boolean uninstallFlag = false;
         if (bundle != null) {
-            uninstallFlag = bundle.getBoolean("uninstall");
+            uninstallFlag = bundle.getBoolean(Constants.PREFERENCES_OVERLAY_REMOVE_FLAG);
         }
 
         int userId = UserHandle.myUserId();
@@ -173,37 +163,37 @@ public class ThemeManageService extends Service {
             Resources themeResources = mPackageManager.getResourcesForApplication(theme.getPackageName());
             AssetManager themeAssetManager = themeResources.getAssets();
 
-            setThemeApplyStatus(THEME_APPLYING, theme);
+            setThemeApplyStatus(Constants.THEME_APPLYING, theme);
 
             IRemoveThemeOverlays(bundle);
 
-            if (theme.hasRingtone() && bundle.getBoolean("theme.ringtone")) {
-                setThemeApplyStatus(THEME_APPLYING_RINGTONE, theme);
-                InputStream is = themeAssetManager.open("sounds/" + theme.getRingtone());
+            if (theme.hasRingtone() && bundle.getBoolean(Constants.THEME_TARGET_RINGTONE)) {
+                setThemeApplyStatus(Constants.THEME_APPLYING_RINGTONE, theme);
+                InputStream is = themeAssetManager.open(Constants.THEME_DATA_ASSETS_SOUNDS + "/" + theme.getRingtone());
                 SoundUtil.setRingtone(this, theme.getRingtone(), is, SoundUtil.TYPE_RINGTONE);
             }
 
-            if (theme.hasAlarmSound() && bundle.getBoolean("theme.alarm")) {
-                setThemeApplyStatus(THEME_APPLYING_ALARM, theme);
-                InputStream is = themeAssetManager.open("sounds/" + theme.getAlarmSound());
+            if (theme.hasAlarmSound() && bundle.getBoolean(Constants.THEME_TARGET_ALARM)) {
+                setThemeApplyStatus(Constants.THEME_APPLYING_ALARM, theme);
+                InputStream is = themeAssetManager.open(Constants.THEME_DATA_ASSETS_SOUNDS + "/" + theme.getAlarmSound());
                 SoundUtil.setRingtone(this, theme.getAlarmSound(), is, SoundUtil.TYPE_ALARM);
             }
 
-            if (theme.hasNotificationSound() && bundle.getBoolean("theme.notification")) {
-                setThemeApplyStatus(THEME_APPLYING_NOTIFICATION, theme);
-                InputStream is = themeAssetManager.open("sounds/" + theme.getNotificationSound());
+            if (theme.hasNotificationSound() && bundle.getBoolean(Constants.THEME_TARGET_NOTIFICATION)) {
+                setThemeApplyStatus(Constants.THEME_APPLYING_NOTIFICATION, theme);
+                InputStream is = themeAssetManager.open(Constants.THEME_DATA_ASSETS_SOUNDS + "/" + theme.getNotificationSound());
                 SoundUtil.setRingtone(this, theme.getNotificationSound(), is, SoundUtil.TYPE_NOTIFICATION);
             }
 
-            if (theme.hasWallpaper() && bundle.getBoolean("theme.wallpaper")) {
-                setThemeApplyStatus(THEME_APPLYING_WALLPAPER, theme);
-                InputStream is = themeAssetManager.open("backgrounds/" + theme.getWallpaper());
+            if (theme.hasWallpaper() && bundle.getBoolean(Constants.THEME_TARGET_WALLPAPER)) {
+                setThemeApplyStatus(Constants.THEME_APPLYING_WALLPAPER, theme);
+                InputStream is = themeAssetManager.open(Constants.THEME_DATA_ASSETS_BACKGROUNDS + "/" + theme.getWallpaper());
                 WallpaperUtil.setWallpaper(this, is);
             }
 
-            if (theme.hasLockScreen() && bundle.getBoolean("theme.lockscreen")) {
-                setThemeApplyStatus(THEME_APPLYING_LOCKSCREEN, theme);
-                InputStream is = themeAssetManager.open("backgrounds/" + theme.getLockScreen());
+            if (theme.hasLockScreen() && bundle.getBoolean(Constants.THEME_TARGET_LOCKSCREEN)) {
+                setThemeApplyStatus(Constants.THEME_APPLYING_LOCKSCREEN, theme);
+                InputStream is = themeAssetManager.open(Constants.THEME_DATA_ASSETS_BACKGROUNDS + "/" + theme.getLockScreen());
                 WallpaperUtil.setLockScreen(this, is);
             }
 
@@ -219,10 +209,10 @@ public class ThemeManageService extends Service {
                 extDataIntent.putExtra("progressVal", progress);
                 extDataIntent.putExtra("nowPackageLabel", ovt.getLabel());
 
-                setThemeApplyStatus(THEME_APPLYING_OVERLAY, theme, extDataIntent);
+                setThemeApplyStatus(Constants.THEME_APPLYING_OVERLAY, theme, extDataIntent);
 
                 // install & enable
-                InputStream is = themeAssetManager.open("overlay/" + ovt.getPackageName());
+                InputStream is = themeAssetManager.open(Constants.THEME_DATA_ASSETS_OVERLAY + "/" + ovt.getPackageName());
 
                 final AtomicBoolean installResult = new AtomicBoolean();
                 installResult.set(false);
@@ -279,9 +269,9 @@ public class ThemeManageService extends Service {
         }
 
         if (ret) {
-            setThemeApplyStatus(THEME_APPLY_SUCCEED, theme);
+            setThemeApplyStatus(Constants.THEME_APPLY_SUCCEED, theme);
         } else {
-            setThemeApplyStatus(THEME_APPLY_FAILED, theme);
+            setThemeApplyStatus(Constants.THEME_APPLY_FAILED, theme);
         }
         return ret;
     }
@@ -292,7 +282,7 @@ public class ThemeManageService extends Service {
         mApplyStatusQueue.clear();
 
         try {
-            setThemeApplyStatus(THEME_APPLYING, theme);
+            setThemeApplyStatus(Constants.THEME_APPLYING, theme);
             IRemoveThemeOverlays(bundle);
             mOverlayService.setEnabled(theme.getPackageName(), true, userId);
         } catch (Exception e) {
@@ -301,9 +291,9 @@ public class ThemeManageService extends Service {
         }
 
         if (ret) {
-            setThemeApplyStatus(THEME_APPLY_SUCCEED, theme);
+            setThemeApplyStatus(Constants.THEME_APPLY_SUCCEED, theme);
         } else {
-            setThemeApplyStatus(THEME_APPLY_FAILED, theme);
+            setThemeApplyStatus(Constants.THEME_APPLY_FAILED, theme);
         }
         return ret;
     }
@@ -315,8 +305,8 @@ public class ThemeManageService extends Service {
             ApplicationInfo ai = pi.applicationInfo;
             ret =  pi.isOverlayPackage() &&
                     ((ai.flags & ApplicationInfo.FLAG_HAS_CODE) == 0) &&
-                    ((ai.metaData.getBoolean("exthmui_theme_overlay", false)) ||
-                    (ai.metaData.getInt("lineage_berry_accent_preview",0) != 0));
+                    ((ai.metaData.getBoolean(Constants.THEME_DATA_OVERLAY_FLAG, false)) ||
+                    (ai.metaData.getInt(Constants.THEME_DATA_ACCENT_COLOR,0) != 0));
         } catch (Exception e) {
             Log.e(TAG, "check package " + packageName + " failed");
         }
@@ -328,8 +318,8 @@ public class ThemeManageService extends Service {
     }
 
     private void setThemeApplyStatus(String status, ThemeBase theme, Intent extraData) {
-        Intent intent = new Intent(ThemeManageService.BROADCAST_ACTION_APPLY_RESULT);
-        intent.setComponent(new ComponentName(getPackageName(), getPackageName() + ".broadcasts.ThemeStatusReceiver"));
+        Intent intent = new Intent(Constants.BROADCAST_ACTION_APPLY_RESULT);
+        intent.setComponent(new ComponentName(getPackageName(), getPackageName() + Constants.BROADCAST_RECEIVER_NAME));
         intent.putExtra("status", status);
         intent.putExtra("themeTitle", theme.getTitle());
         intent.putExtra("themePackage", theme.getPackageName());

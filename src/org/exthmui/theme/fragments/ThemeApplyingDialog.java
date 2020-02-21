@@ -31,7 +31,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import org.exthmui.theme.R;
-import org.exthmui.theme.services.ThemeManageService;
+import org.exthmui.theme.misc.Constants;
 
 public class ThemeApplyingDialog extends DialogFragment {
 
@@ -109,31 +109,31 @@ public class ThemeApplyingDialog extends DialogFragment {
         int max = 0, progress = 0;
         boolean indeterminate = true;
         switch (status) {
-            case ThemeManageService.THEME_APPLY_SUCCEED:
+            case Constants.THEME_APPLY_SUCCEED:
                 msg = getString(R.string.skin_apply_status_succeed, dialogData.getString("themeTitle", "ERROR"));
                 break;
-            case ThemeManageService.THEME_APPLY_FAILED:
+            case Constants.THEME_APPLY_FAILED:
                 msg = getString(R.string.skin_apply_status_failed, dialogData.getString("themeTitle", "ERROR"));
                 break;
-            case ThemeManageService.THEME_APPLYING:
+            case Constants.THEME_APPLYING:
                 msg = getString(R.string.skin_apply_status_running);
                 break;
-            case ThemeManageService.THEME_APPLYING_ALARM:
+            case Constants.THEME_APPLYING_ALARM:
                 msg = getString(R.string.skin_apply_status_alarm);
                 break;
-            case ThemeManageService.THEME_APPLYING_RINGTONE:
+            case Constants.THEME_APPLYING_RINGTONE:
                 msg = getString(R.string.skin_apply_status_ringtone);
                 break;
-            case ThemeManageService.THEME_APPLYING_NOTIFICATION:
+            case Constants.THEME_APPLYING_NOTIFICATION:
                 msg = getString(R.string.skin_apply_status_notification);
                 break;
-            case ThemeManageService.THEME_APPLYING_WALLPAPER:
+            case Constants.THEME_APPLYING_WALLPAPER:
                 msg = getString(R.string.skin_apply_status_wallpaper);
                 break;
-            case ThemeManageService.THEME_APPLYING_LOCKSCREEN:
+            case Constants.THEME_APPLYING_LOCKSCREEN:
                 msg = getString(R.string.skin_apply_status_lockscreen);
                 break;
-            case ThemeManageService.THEME_APPLYING_OVERLAY:
+            case Constants.THEME_APPLYING_OVERLAY:
                 max = dialogData.getInt("progressMax", 0);
                 progress = dialogData.getInt("progressVal", 0);
                 indeterminate = false;
@@ -142,7 +142,7 @@ public class ThemeApplyingDialog extends DialogFragment {
             default:
                 return;
         }
-        if (ThemeManageService.THEME_APPLY_FAILED.equals(status) || ThemeManageService.THEME_APPLY_SUCCEED.equals(status)) {
+        if (Constants.THEME_APPLY_FAILED.equals(status) || Constants.THEME_APPLY_SUCCEED.equals(status)) {
             btnDismiss.setVisibility(View.VISIBLE);
             progApplying.setVisibility(View.GONE);
             this.setCancelable(true);
