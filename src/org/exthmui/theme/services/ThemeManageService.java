@@ -114,6 +114,8 @@ public class ThemeManageService extends Service {
         }
 
         int userId = UserHandle.myUserId();
+        final AtomicBoolean removeResult = new AtomicBoolean();
+        removeResult.set(false);
 
         for (PackageInfo pkgInfo : allPackages) {
             ApplicationInfo ai = pkgInfo.applicationInfo;
@@ -133,7 +135,31 @@ public class ThemeManageService extends Service {
 
                 // uninstall
                 if (uninstallFlag) {
-                    PackageUtil.uninstallPackage(this, ai.packageName, null);
+                    synchronized (removeResult) {
+                        PackageUtil.uninstallPackage(this, ai.packageName, new PackageUtil.PackageInstallerCallback() {
+                            @Override
+                            public void onSuccess(String packageName) {
+                                synchronized (removeResult) {
+                                    removeResult.set(true);
+                                    removeResult.notify();
+                                }
+                            }
+
+                            @Override
+                            public void onFailure(String packageName, int code) {
+                                synchronized (removeResult) {
+                                    removeResult.set(false);
+                                    removeResult.notify();
+                                }
+                            }
+                        });
+
+                        try {
+                            removeResult.wait();
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    }
                 }
             }
         }
