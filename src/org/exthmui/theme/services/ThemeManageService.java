@@ -106,9 +106,13 @@ public class ThemeManageService extends Service {
     private void IRemoveThemeOverlays(Bundle bundle) {
 
         List<PackageInfo> allPackages = mPackageManager.getInstalledPackages(0);
-        List<String> whiteList = bundle.getStringArrayList("whitelist");
+        List<String> whiteList = null;
+        boolean uninstallFlag = false;
+        if (bundle != null) {
+            whiteList = bundle.getStringArrayList("whitelist");
+            uninstallFlag = bundle.getBoolean("uninstall");
+        }
 
-        boolean uninstallFlag = bundle.getBoolean("uninstall");
         int userId = UserHandle.myUserId();
 
         for (PackageInfo pkgInfo : allPackages) {
