@@ -20,7 +20,6 @@ import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 
-
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -28,7 +27,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Switch;
@@ -41,10 +39,7 @@ import org.exthmui.theme.models.ThemeAccent;
 import org.exthmui.theme.models.ThemeBase;
 import org.exthmui.theme.models.ThemeItem;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class ThemePreviewFragment extends Fragment {
 
@@ -54,7 +49,7 @@ public class ThemePreviewFragment extends Fragment {
     private ThemeAccent mThemeAccent;
     private ThemePreviewInterface mCallback;
     private View view;
-    private Map<String, Boolean> mThemeTargetMap;
+    private Bundle themeTargetBundle;
 
     private LinearLayout appLayout;
     private LinearLayout previewLayout;
@@ -76,7 +71,6 @@ public class ThemePreviewFragment extends Fragment {
         if (context != null) {
             mCallback = (ThemePreviewInterface) context;
         }
-        mThemeTargetMap = new HashMap<>();
     }
 
     @Nullable
@@ -97,34 +91,9 @@ public class ThemePreviewFragment extends Fragment {
         Button btnApply = view.findViewById(R.id.apply_theme_button);
         ImageView btnBack = view.findViewById(R.id.button_back);
 
-        btnApply.setOnClickListener(v -> {
-            if (mThemeItem != null) {
-                Bundle bundle = new Bundle();
-                bundle.putString("package", mThemeItem.getPackageName());
-                bundle.putBoolean("ringtone", mThemeTargetMap.get("ringtone"));
-                bundle.putBoolean("alarm", mThemeTargetMap.get("alarm"));
-                bundle.putBoolean("notification", mThemeTargetMap.get("notification"));
-                bundle.putBoolean("wallpaper", mThemeTargetMap.get("wallpaper"));
-                bundle.putBoolean("lockscreen", mThemeTargetMap.get("lockscreen"));
+        themeTargetBundle = new Bundle();
 
-                ArrayList<String> whiteList = new ArrayList<>();
-                for (Map.Entry<String, Boolean> entry : mThemeTargetMap.entrySet()) {
-                    String key = entry.getKey();
-                    if (!entry.getValue() && !key.equals("wallpaper") && !key.equals("lockscreen")
-                            && !key.equals("ringtone") && !key.equals("alarm") && !key.equals("notification")) {
-                        whiteList.add(key);
-                    }
-                }
-                bundle.putStringArrayList("whitelist", whiteList);
-                mCallback.applyTheme(bundle);
-            } else if (mThemeAccent != null) {
-                Bundle bundle = new Bundle();
-                bundle.putString("package", mThemeAccent.getPackageName());
-                bundle.putStringArrayList("whitelist", new ArrayList<>());
-                mCallback.applyTheme(bundle);
-            }
-
-        });
+        btnApply.setOnClickListener(v -> mCallback.applyTheme(themeTargetBundle));
 
         btnBack.setOnClickListener(v -> getActivity().onBackPressed());
 
@@ -159,19 +128,12 @@ public class ThemePreviewFragment extends Fragment {
     private void updateViewForTheme() {
         imageBanner.setImageDrawable(mCallback.getThemeBanner(mThemeItem.getPackageName()));
 
-        mThemeTargetMap.put("wallpaper", false);
-        mThemeTargetMap.put("lockscreen", false);
-
-        mThemeTargetMap.put("ringtone", false);
-        mThemeTargetMap.put("alarm", false);
-        mThemeTargetMap.put("notification", false);
-
         // wallpaper
         if (mThemeItem.hasWallpaper()) {
-            addSwitch(wallpaperLayout, "wallpaper", R.string.background_wallpaper);
+            addSwitch(wallpaperLayout, "theme.wallpaper", R.string.background_wallpaper);
         }
         if (mThemeItem.hasLockScreen()) {
-            addSwitch(wallpaperLayout, "lockscreen", R.string.background_lockscreen);
+            addSwitch(wallpaperLayout, "theme.lockscreen", R.string.background_lockscreen);
         }
 
         if (!mThemeItem.hasWallpaper() && !mThemeItem.hasLockScreen()) {
@@ -180,13 +142,13 @@ public class ThemePreviewFragment extends Fragment {
 
         // sound
         if (mThemeItem.hasRingtone()) {
-            addSwitch(soundLayout, "ringtone", R.string.sound_ringtone);
+            addSwitch(soundLayout, "theme.ringtone", R.string.sound_ringtone);
         }
         if (mThemeItem.hasAlarmSound()) {
-            addSwitch(soundLayout, "alarm", R.string.sound_alarm);
+            addSwitch(soundLayout, "theme.alarm", R.string.sound_alarm);
         }
         if (mThemeItem.hasNotificationSound()) {
-            addSwitch(soundLayout, "notification", R.string.sound_notification);
+            addSwitch(soundLayout, "theme.notification", R.string.sound_notification);
         }
 
         if (!mThemeItem.hasRingtone() && !mThemeItem.hasAlarmSound() && !mThemeItem.hasNotificationSound()) {
@@ -221,7 +183,7 @@ public class ThemePreviewFragment extends Fragment {
         soundLayout.setVisibility(View.GONE);
         appLayout.setVisibility(View.GONE);
         previewLayout.setVisibility(View.GONE);
-        mThemeTargetMap.put("android", true);
+        themeTargetBundle.putBoolean("android", true);
     }
 
     private void addSwitch(LinearLayout layout, final String id, int text) {
@@ -239,9 +201,9 @@ public class ThemePreviewFragment extends Fragment {
         tmpSwitch.setText(text);
         tmpSwitch.setChecked(true);
         tmpSwitch.setPadding(paddingLeft, paddingTop, paddingRight, paddingBottom);
-        mThemeTargetMap.put(id, true);
+        themeTargetBundle.putBoolean(id, true);
 
-        tmpSwitch.setOnCheckedChangeListener((compoundButton, b) -> mThemeTargetMap.put(id, b));
+        tmpSwitch.setOnCheckedChangeListener((compoundButton, b) -> themeTargetBundle.putBoolean(id, b));
 
         tmpSwitch.setEnabled(enabled);
 

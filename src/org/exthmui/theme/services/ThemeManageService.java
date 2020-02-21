@@ -106,10 +106,8 @@ public class ThemeManageService extends Service {
     private void IRemoveThemeOverlays(Bundle bundle) {
 
         List<PackageInfo> allPackages = mPackageManager.getInstalledPackages(0);
-        List<String> whiteList = null;
         boolean uninstallFlag = false;
         if (bundle != null) {
-            whiteList = bundle.getStringArrayList("whitelist");
             uninstallFlag = bundle.getBoolean("uninstall");
         }
 
@@ -122,7 +120,7 @@ public class ThemeManageService extends Service {
 
             if (isThemeOverlayPackage(pkgInfo.packageName)) {
 
-                if (whiteList != null && whiteList.contains(pkgInfo.overlayTarget)) {
+                if (bundle != null && !bundle.getBoolean(pkgInfo.overlayTarget, true)) {
                     continue;
                 }
 
@@ -166,7 +164,6 @@ public class ThemeManageService extends Service {
     }
 
     private boolean IApplyTheme(ThemeItem theme, Bundle bundle) {
-        final ArrayList<String> whiteList = bundle.getStringArrayList("whitelist");
         final int userId = UserHandle.myUserId();
         boolean ret = true;
         mApplyStatusQueue.clear();
@@ -180,31 +177,31 @@ public class ThemeManageService extends Service {
 
             IRemoveThemeOverlays(bundle);
 
-            if (theme.hasRingtone() && bundle.getBoolean("ringtone")) {
+            if (theme.hasRingtone() && bundle.getBoolean("theme.ringtone")) {
                 setThemeApplyStatus(THEME_APPLYING_RINGTONE, theme);
                 InputStream is = themeAssetManager.open("sounds/" + theme.getRingtone());
                 SoundUtil.setRingtone(this, theme.getRingtone(), is, SoundUtil.TYPE_RINGTONE);
             }
 
-            if (theme.hasAlarmSound() && bundle.getBoolean("alarm")) {
+            if (theme.hasAlarmSound() && bundle.getBoolean("theme.alarm")) {
                 setThemeApplyStatus(THEME_APPLYING_ALARM, theme);
                 InputStream is = themeAssetManager.open("sounds/" + theme.getAlarmSound());
                 SoundUtil.setRingtone(this, theme.getAlarmSound(), is, SoundUtil.TYPE_ALARM);
             }
 
-            if (theme.hasNotificationSound() && bundle.getBoolean("notification")) {
+            if (theme.hasNotificationSound() && bundle.getBoolean("theme.notification")) {
                 setThemeApplyStatus(THEME_APPLYING_NOTIFICATION, theme);
                 InputStream is = themeAssetManager.open("sounds/" + theme.getNotificationSound());
                 SoundUtil.setRingtone(this, theme.getNotificationSound(), is, SoundUtil.TYPE_NOTIFICATION);
             }
 
-            if (theme.hasWallpaper() && bundle.getBoolean("wallpaper")) {
+            if (theme.hasWallpaper() && bundle.getBoolean("theme.wallpaper")) {
                 setThemeApplyStatus(THEME_APPLYING_WALLPAPER, theme);
                 InputStream is = themeAssetManager.open("backgrounds/" + theme.getWallpaper());
                 WallpaperUtil.setWallpaper(this, is);
             }
 
-            if (theme.hasLockScreen() && bundle.getBoolean("lockscreen")) {
+            if (theme.hasLockScreen() && bundle.getBoolean("theme.lockscreen")) {
                 setThemeApplyStatus(THEME_APPLYING_LOCKSCREEN, theme);
                 InputStream is = themeAssetManager.open("backgrounds/" + theme.getLockScreen());
                 WallpaperUtil.setLockScreen(this, is);
@@ -212,13 +209,13 @@ public class ThemeManageService extends Service {
 
             int progress = 0;
             Intent extDataIntent = new Intent();
-            extDataIntent.putExtra("progressMax", overlayTargetPackages.size() - (whiteList != null ? whiteList.size() : 0));
+            extDataIntent.putExtra("progressMax", overlayTargetPackages.size());
 
             for (OverlayTarget ovt : overlayTargetPackages) {
-                if (whiteList != null && whiteList.contains(ovt.getPackageName())) {
+                progress++;
+                if (!bundle.getBoolean(ovt.getPackageName())) {
                     continue;
                 }
-                progress++;
                 extDataIntent.putExtra("progressVal", progress);
                 extDataIntent.putExtra("nowPackageLabel", ovt.getLabel());
 
