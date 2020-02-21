@@ -102,18 +102,12 @@ public class ThemePickerActivity extends FragmentActivity implements ThemePicker
         switch (item.getItemId()) {
             case R.id.action_refresh: {
                 refreshAnimationStart();
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        updateThemeList();
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                mFragment.updateAdapter();
-                                refreshAnimationStop();
-                            }
-                        });
-                    }
+                new Thread(() -> {
+                    updateThemeList();
+                    runOnUiThread(() -> {
+                        mFragment.updateAdapter();
+                        refreshAnimationStop();
+                    });
                 }).start();
                 return true;
             }
@@ -202,8 +196,10 @@ public class ThemePickerActivity extends FragmentActivity implements ThemePicker
                             .putBoolean("overlay_uninstall_flag",
                                     overlayUninstallFlag.isChecked())
                             .apply();
-                    updateThemeList();
-                    mFragment.updateAdapter();
+                    new Thread(() -> {
+                        updateThemeList();
+                        runOnUiThread(() -> mFragment.updateAdapter());
+                    }).start();
                 })
                 .show();
     }
