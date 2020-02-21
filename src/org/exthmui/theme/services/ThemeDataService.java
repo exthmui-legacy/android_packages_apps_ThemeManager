@@ -63,12 +63,11 @@ public class ThemeDataService extends Service {
 
     public class ThemeDataBinder extends Binder {
         public List<ThemeBase> getThemeBaseList() {
-            if (mThemeBaseList.isEmpty()) updateThemeList();
             return mThemeBaseList;
         }
 
-        public void updateThemeList() {
-            IUpdateThemeList();
+        public void updateThemeList(boolean listAccentPackages) {
+            IUpdateThemeList(listAccentPackages);
         }
 
         public boolean isThemePackage(String packageName) {
@@ -100,7 +99,7 @@ public class ThemeDataService extends Service {
         }
     }
 
-    private void IUpdateThemeList() {
+    private void IUpdateThemeList(boolean listAccentPackages) {
         List<PackageInfo> allPackages = mPackageManager.getInstalledPackages(0);
         mThemeBaseList.clear();
 
@@ -109,7 +108,7 @@ public class ThemeDataService extends Service {
                 ThemeBase themeBase = new ThemeBase(pkgInfo.packageName);
                 IGetThemeBaseInfo(themeBase);
                 mThemeBaseList.add(themeBase);
-            } else if (IsAccentColorPackage(pkgInfo.packageName)) {
+            } else if (listAccentPackages && IsAccentColorPackage(pkgInfo.packageName)) {
                 ThemeAccent themeAccent = IGetThemeAccent(pkgInfo.packageName);
                 mThemeBaseList.add(themeAccent);
             }

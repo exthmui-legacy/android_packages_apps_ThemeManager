@@ -20,9 +20,11 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.content.SharedPreferences;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
@@ -52,6 +54,8 @@ public class ThemePreviewActivity extends FragmentActivity implements ThemePrevi
     private ThemeItem mThemeItem;
     private ThemeAccent mThemeAccent;
 
+    private SharedPreferences mPreferences;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -66,6 +70,8 @@ public class ThemePreviewActivity extends FragmentActivity implements ThemePrevi
                     .commitNow();
             mApplyingDialog = new ThemeApplyingDialog();
         }
+
+        mPreferences = PreferenceManager.getDefaultSharedPreferences(this);
 
         Intent mThemeDataService = new Intent(this, ThemeDataService.class);
         mThemeDataConn = new ThemeDataConn();
@@ -115,6 +121,7 @@ public class ThemePreviewActivity extends FragmentActivity implements ThemePrevi
     @Override
     public void applyTheme(Bundle bundle) {
         mApplyingDialog.show(getSupportFragmentManager(), TAG);
+        bundle.putBoolean("uninstall", mPreferences.getBoolean("overlay_uninstall_flag", false));
         new Thread(() -> {
             if (mThemeItem != null) {
                 mThemeManageBinder.applyTheme(mThemeItem, bundle);

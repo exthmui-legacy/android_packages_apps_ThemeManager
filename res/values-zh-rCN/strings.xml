@@ -46,5 +46,9 @@
 
     <string name="dialog_remove_package_title">卸载主题</string>
     <string name="dialog_remove_package_text">卸载 %1$s ？</string>
+    <string name="menu_refresh">刷新</string>
+    <string name="menu_preferences">首选项</string>
+    <string name="preferences_overlay_uninstall_flag">停用叠加层后将其卸载</string>
+    <string name="preferences_list_accent_packages">列出强调色主题</string>
 
 </resources>

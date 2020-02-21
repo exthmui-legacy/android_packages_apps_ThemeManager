@@ -46,4 +46,10 @@
 
     <string name="dialog_remove_package_title">Uninstall theme</string>
     <string name="dialog_remove_package_text">Are you sure you want to uninstall %1$s ?</string>
+
+    <string name="menu_refresh">Refresh</string>
+    <string name="menu_preferences">Preferences</string>
+
+    <string name="preferences_list_accent_packages">List accent packages</string>
+    <string name="preferences_overlay_uninstall_flag">Uninstall the overlay after disabling it</string>
 </resources>

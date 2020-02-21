@@ -21,13 +21,22 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.content.SharedPreferences;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
+import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.LinearInterpolator;
+import android.view.animation.RotateAnimation;
 import android.widget.AdapterView;
+import android.widget.Switch;
 
 import org.exthmui.theme.fragments.ThemePickerFragment;
 import org.exthmui.theme.interfaces.ThemePickerInterface;
@@ -49,6 +58,10 @@ public class ThemePickerActivity extends FragmentActivity implements ThemePicker
     private ThemeDataConn mThemeDataConn;
     private ThemePickerFragment mFragment;
 
+    private SharedPreferences mPreferences;
+    private View mRefreshIconView;
+    private RotateAnimation mRefreshAnimation;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -64,6 +77,12 @@ public class ThemePickerActivity extends FragmentActivity implements ThemePicker
                     .commitNow();
         }
 
+        mPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        mRefreshAnimation = new RotateAnimation(0, 360, Animation.RELATIVE_TO_SELF, 0.5f,
+                Animation.RELATIVE_TO_SELF, 0.5f);
+        mRefreshAnimation.setInterpolator(new LinearInterpolator());
+        mRefreshAnimation.setDuration(1000);
+
         Intent mThemeDataService = new Intent(this, ThemeDataService.class);
         mThemeDataConn = new ThemeDataConn();
         Intent mThemeManageService = new Intent(this, ThemeManageService.class);
@@ -72,6 +91,57 @@ public class ThemePickerActivity extends FragmentActivity implements ThemePicker
         bindService(mThemeDataService, mThemeDataConn, Context.BIND_AUTO_CREATE);
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_toolbar, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_refresh: {
+                refreshAnimationStart();
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        updateThemeList();
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                mFragment.updateAdapter();
+                                refreshAnimationStop();
+                            }
+                        });
+                    }
+                }).start();
+                return true;
+            }
+            case R.id.action_preferences: {
+                showPreferencesDialog();
+                return true;
+            }
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    private void refreshAnimationStart() {
+        if (mRefreshIconView == null) {
+            mRefreshIconView = findViewById(R.id.action_refresh);
+        }
+        if (mRefreshIconView != null) {
+            mRefreshAnimation.setRepeatCount(Animation.INFINITE);
+            mRefreshIconView.startAnimation(mRefreshAnimation);
+            mRefreshIconView.setEnabled(false);
+        }
+    }
+
+    private void refreshAnimationStop() {
+        if (mRefreshIconView != null) {
+            mRefreshAnimation.setRepeatCount(0);
+            mRefreshIconView.setEnabled(true);
+        }
+    }
 
     @Override
     protected void onDestroy() {
@@ -93,7 +163,7 @@ public class ThemePickerActivity extends FragmentActivity implements ThemePicker
 
     @Override
     public void updateThemeList() {
-        mThemeDataBinder.updateThemeList();
+        mThemeDataBinder.updateThemeList(mPreferences.getBoolean("list_accents", true));
     }
 
     @Override
@@ -112,6 +182,30 @@ public class ThemePickerActivity extends FragmentActivity implements ThemePicker
     @Override
     public void onAttachFragment(Fragment fragment) {
         mFragment = (ThemePickerFragment) fragment;
+    }
+
+    private void showPreferencesDialog() {
+        View view = LayoutInflater.from(this).inflate(R.layout.preferences_dialog, null);
+        Switch listAccentPackages = view.findViewById(R.id.preferences_list_accent_packages);
+        Switch overlayUninstallFlag = view.findViewById(R.id.preferences_overlay_uninstall_flag);
+
+        listAccentPackages.setChecked(mPreferences.getBoolean("list_accents", true));
+        overlayUninstallFlag.setChecked(mPreferences.getBoolean("overlay_uninstall_flag", false));
+
+        new AlertDialog.Builder(this)
+                .setTitle(R.string.menu_preferences)
+                .setView(view)
+                .setOnDismissListener(dialogInterface -> {
+                    mPreferences.edit()
+                            .putBoolean("list_accents",
+                                    listAccentPackages.isChecked())
+                            .putBoolean("overlay_uninstall_flag",
+                                    overlayUninstallFlag.isChecked())
+                            .apply();
+                    updateThemeList();
+                    mFragment.updateAdapter();
+                })
+                .show();
     }
 
     private void askUninstallTheme(int index) {
@@ -146,6 +240,7 @@ public class ThemePickerActivity extends FragmentActivity implements ThemePicker
         public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
             mThemeDataBinder = (ThemeDataService.ThemeDataBinder) iBinder;
             new Thread(() -> {
+                updateThemeList();
                 mThemeList = mThemeDataBinder.getThemeBaseList();
                 runOnUiThread(() -> mFragment.updateView());
             }).start();

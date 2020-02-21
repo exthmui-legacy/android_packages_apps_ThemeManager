@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="theme_preview_overlay">#77000000</color>
+    <color name="menu_icon">#212121</color>
 </resources>

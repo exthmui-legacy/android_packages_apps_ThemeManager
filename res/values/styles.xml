@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+
     <style name="Theme.Picker.ApplySkinButton" parent="@android:style/Theme.DeviceDefault">
         <item name="android:colorButtonNormal">?android:colorAccent</item>
     </style>
