@@ -157,12 +157,7 @@ public class ThemePreviewActivity extends FragmentActivity implements ThemePrevi
             mThemeManageBinder.setThemeApplyStatusListener(data -> {
                 if (mFragment == null || mApplyingDialog == null) return;
                 sendBroadcast(data);
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        mApplyingDialog.updateData(data);
-                    }
-                });
+                runOnUiThread(() -> mApplyingDialog.updateData(data));
             });
         }
 

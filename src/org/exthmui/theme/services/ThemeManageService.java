@@ -43,7 +43,6 @@ import org.exthmui.theme.utils.SoundUtil;
 import org.exthmui.theme.utils.WallpaperUtil;
 
 import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.LinkedBlockingQueue;
