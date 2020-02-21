@@ -39,9 +39,7 @@ import org.exthmui.theme.models.ThemeItem;
 
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Stack;
 
 public class ThemeDataService extends Service {
@@ -241,12 +239,12 @@ public class ThemeDataService extends Service {
             IGetThemeBaseInfo(theme);
 
             Stack<String> xmlTags = new Stack<>();
-            Map<String, Integer> attrMap = new HashMap<>();
             List<OverlayTarget> overlayTargetList = new ArrayList<>();
             int themeInfoXmlResId = resources.getIdentifier(Constants.THEME_DATA_XML_FILE, "xml", packageName);
             XmlResourceParser themeInfoXml = resources.getXml(themeInfoXmlResId);
             int eventType = themeInfoXml.getEventType();
             boolean overlaySwitchable = true;
+            int ratioWidth = -1, ratioHeight = -1;
 
             while (eventType != XmlResourceParser.END_DOCUMENT) {
                 switch (eventType) {
@@ -266,9 +264,13 @@ public class ThemeDataService extends Service {
                                 }
                                 break;
                             case Constants.THEME_DATA_XML_BACKGROUND_WALLPAPER: case Constants.THEME_DATA_XML_BACKGROUND_LOCKSCREEN:
-                                attrMap.clear();
+                                ratioWidth = ratioHeight = -1;
                                 for (int i = 0; i < themeInfoXml.getAttributeCount(); i++) {
-                                    attrMap.put(themeInfoXml.getAttributeName(i), themeInfoXml.getAttributeIntValue(i, -1));
+                                    if (themeInfoXml.getAttributeName(i).equals(Constants.THEME_DATA_XML_BACKGROUND_RATIO_WIDTH)) {
+                                        ratioWidth = themeInfoXml.getAttributeIntValue(i, -1);
+                                    } else if (themeInfoXml.getAttributeName(i).equals(Constants.THEME_DATA_XML_BACKGROUND_RATIO_HEIGHT)) {
+                                        ratioHeight = themeInfoXml.getAttributeIntValue(i, -1);
+                                    }
                                 }
                                 break;
                         }
@@ -288,14 +290,14 @@ public class ThemeDataService extends Service {
 
                             // background
                             case Constants.THEME_DATA_XML_BACKGROUND_WALLPAPER:
-                                if ((attrMap.isEmpty() && !theme.hasWallpaper()) ||
-                                        (displayMetrics.widthPixels / attrMap.getOrDefault(Constants.THEME_DATA_XML_BACKGROUND_RATIO_WIDTH, 1) == displayMetrics.heightPixels / attrMap.getOrDefault(Constants.THEME_DATA_XML_BACKGROUND_RATIO_HEIGHT, 1))) {
+                                if ((ratioHeight == -1 || ratioWidth == -1 && !theme.hasWallpaper()) ||
+                                        (displayMetrics.widthPixels / ratioWidth == displayMetrics.heightPixels / ratioHeight)) {
                                     theme.setWallpaper(themeInfoXml.getText());
                                 }
                                 break;
                             case Constants.THEME_DATA_XML_BACKGROUND_LOCKSCREEN:
-                                if ((attrMap.isEmpty() && !theme.hasLockScreen()) ||
-                                        (displayMetrics.widthPixels / attrMap.getOrDefault(Constants.THEME_DATA_XML_BACKGROUND_RATIO_WIDTH, 1) == displayMetrics.heightPixels / attrMap.getOrDefault(Constants.THEME_DATA_XML_BACKGROUND_RATIO_HEIGHT, 1))) {
+                                if ((ratioHeight == -1 || ratioWidth == -1 && !theme.hasLockScreen()) ||
+                                        (displayMetrics.widthPixels / ratioWidth == displayMetrics.heightPixels / ratioHeight)) {
                                     theme.setLockScreen(themeInfoXml.getText());
                                 }
                                 break;
