@@ -90,7 +90,6 @@ public class ThemePickerFragment extends Fragment {
 
         @Override
         public void bindView(ViewHolder holder, ThemeBase obj) {
-            holder.setImageResource(R.id.theme_card_image, R.drawable.theme_default_src);
             new Thread(() -> {
                 Drawable drawable =  mCallback.getThemeImage(obj.getPackageName());
                 getActivity().runOnUiThread(() -> holder.setImageResource(R.id.theme_card_image, drawable));
