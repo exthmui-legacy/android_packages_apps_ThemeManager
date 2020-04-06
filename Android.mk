@@ -9,9 +9,8 @@ LOCAL_SRC_FILES := $(call all-java-files-under, src)
 LOCAL_USE_AAPT2 := true
 
 LOCAL_STATIC_ANDROID_LIBRARIES := \
-    android-support-design \
-    android-support-transition \
-    android-support-v4
+    com.google.android.material_material \
+	androidx.appcompat_appcompat
 
 LOCAL_RESOURCE_DIR := \
     $(LOCAL_PATH)/res
