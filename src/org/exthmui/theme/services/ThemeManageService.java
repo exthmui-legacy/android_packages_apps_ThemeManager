@@ -35,7 +35,6 @@ import android.util.Log;
 
 import org.exthmui.theme.misc.Constants;
 import org.exthmui.theme.models.OverlayTarget;
-import org.exthmui.theme.models.ThemeAccent;
 import org.exthmui.theme.models.ThemeBase;
 import org.exthmui.theme.models.ThemeItem;
 import org.exthmui.theme.utils.PackageUtil;
@@ -72,10 +71,6 @@ public class ThemeManageService extends Service {
     public class ThemeManageBinder extends Binder {
         public boolean applyTheme(ThemeItem theme, Bundle bundle) {
             return IApplyTheme(theme, bundle);
-        }
-
-        public boolean applyThemeAccent(ThemeAccent themeAccent, Bundle bundle) {
-            return IApplyThemeAccent(themeAccent, bundle);
         }
 
         public void removeThemeOverlays(Bundle bundle) {
@@ -275,28 +270,6 @@ public class ThemeManageService extends Service {
         return ret;
     }
 
-    private boolean IApplyThemeAccent(ThemeAccent theme, Bundle bundle) {
-        final int userId = UserHandle.myUserId();
-        boolean ret = true;
-        mApplyStatusQueue.clear();
-
-        try {
-            setThemeApplyStatus(Constants.THEME_APPLYING, theme);
-            IRemoveThemeOverlays(bundle);
-            mOverlayService.setEnabled(theme.getPackageName(), true, userId);
-        } catch (Exception e) {
-            Log.e(TAG, "Failed to apply theme " + theme.getPackageName());
-            ret = false;
-        }
-
-        if (ret) {
-            setThemeApplyStatus(Constants.THEME_APPLY_SUCCEED, theme);
-        } else {
-            setThemeApplyStatus(Constants.THEME_APPLY_FAILED, theme);
-        }
-        return ret;
-    }
-
     private boolean isThemeOverlayPackage(String packageName) {
         boolean ret = false;
         try {
@@ -304,8 +277,7 @@ public class ThemeManageService extends Service {
             ApplicationInfo ai = pi.applicationInfo;
             ret =  pi.isOverlayPackage() &&
                     ((ai.flags & ApplicationInfo.FLAG_HAS_CODE) == 0) &&
-                    ((ai.metaData.getBoolean(Constants.THEME_DATA_OVERLAY_FLAG, false)) ||
-                    (ai.metaData.getInt(Constants.THEME_DATA_ACCENT_COLOR,0) != 0));
+                    ((ai.metaData.getBoolean(Constants.THEME_DATA_OVERLAY_FLAG, false)));
         } catch (Exception e) {
             Log.e(TAG, "check package " + packageName + " failed");
         }

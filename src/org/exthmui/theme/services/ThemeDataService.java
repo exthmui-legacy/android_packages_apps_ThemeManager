@@ -33,7 +33,6 @@ import android.util.Log;
 
 import org.exthmui.theme.misc.Constants;
 import org.exthmui.theme.models.OverlayTarget;
-import org.exthmui.theme.models.ThemeAccent;
 import org.exthmui.theme.models.ThemeBase;
 import org.exthmui.theme.models.ThemeItem;
 
@@ -65,20 +64,12 @@ public class ThemeDataService extends Service {
             return mThemeBaseList;
         }
 
-        public void updateThemeList(boolean listAccentPackages) {
-            IUpdateThemeList(listAccentPackages);
+        public void updateThemeList() {
+            IUpdateThemeList();
         }
 
         public boolean isThemePackage(String packageName) {
             return IsThemePackage(packageName);
-        }
-
-        public boolean isAccentColorPackage(String packageName) {
-            return IsAccentColorPackage(packageName);
-        }
-
-        public ThemeAccent getThemeAccent(String packageName) {
-            return IGetThemeAccent(packageName);
         }
 
         public ThemeItem getThemeItem(String packageName) {
@@ -98,7 +89,7 @@ public class ThemeDataService extends Service {
         }
     }
 
-    private void IUpdateThemeList(boolean listAccentPackages) {
+    private void IUpdateThemeList() {
         List<PackageInfo> allPackages = mPackageManager.getInstalledPackages(0);
         mThemeBaseList.clear();
 
@@ -107,9 +98,6 @@ public class ThemeDataService extends Service {
                 ThemeBase themeBase = new ThemeBase(pkgInfo.packageName);
                 IGetThemeBaseInfo(themeBase);
                 mThemeBaseList.add(themeBase);
-            } else if (listAccentPackages && IsAccentColorPackage(pkgInfo.packageName)) {
-                ThemeAccent themeAccent = IGetThemeAccent(pkgInfo.packageName);
-                mThemeBaseList.add(themeAccent);
             }
         }
     }
@@ -121,20 +109,6 @@ public class ThemeDataService extends Service {
             Bundle metadata = ai.metaData;
             if (metadata != null) {
                 ret = metadata.getBoolean(Constants.THEME_DATA_FLAG,false);
-            }
-        } catch (Exception e) {
-            Log.e(TAG, "check package " + packageName + " failed");
-        }
-        return ret;
-    }
-
-    private boolean IsAccentColorPackage(String packageName) {
-        boolean ret = false;
-        try {
-            ApplicationInfo ai = mPackageManager.getApplicationInfo(packageName, PackageManager.GET_META_DATA);
-            Bundle metadata = ai.metaData;
-            if (metadata != null) {
-                ret = metadata.getInt(Constants.THEME_DATA_ACCENT_COLOR,0) != 0;
             }
         } catch (Exception e) {
             Log.e(TAG, "check package " + packageName + " failed");
@@ -212,22 +186,6 @@ public class ThemeDataService extends Service {
             themeBase.setRemovable((ai.flags & ApplicationInfo.FLAG_SYSTEM) != 0);
         } catch (Exception e) {
             Log.e(TAG, "Failed to get theme info: " + packageName);
-        }
-    }
-
-    private ThemeAccent IGetThemeAccent(String packageName) {
-        try {
-            ApplicationInfo ai = mPackageManager.getApplicationInfo(packageName, PackageManager.GET_META_DATA);
-            ThemeAccent themeAccent = new ThemeAccent(packageName);
-
-            themeAccent.setTitle(ai.loadLabel(mPackageManager).toString());
-            themeAccent.setAuthor(Constants.THEME_DATA_ACCENT_AUTHOR);
-            themeAccent.setAccentColor(ai.metaData.getInt(Constants.THEME_DATA_ACCENT_COLOR,0));
-            themeAccent.setRemovable((ai.flags & ApplicationInfo.FLAG_SYSTEM) != 0);
-            return themeAccent;
-        } catch (Exception e) {
-            Log.e(TAG, "Failed to get theme info: " + packageName);
-            return null;
         }
     }
 

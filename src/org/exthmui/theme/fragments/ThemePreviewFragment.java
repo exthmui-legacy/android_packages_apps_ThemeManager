@@ -37,7 +37,6 @@ import org.exthmui.theme.R;
 import org.exthmui.theme.interfaces.ThemePreviewInterface;
 import org.exthmui.theme.misc.Constants;
 import org.exthmui.theme.models.OverlayTarget;
-import org.exthmui.theme.models.ThemeAccent;
 import org.exthmui.theme.models.ThemeBase;
 import org.exthmui.theme.models.ThemeItem;
 
@@ -48,7 +47,6 @@ public class ThemePreviewFragment extends Fragment {
     private static final String TAG = "ThemePreviewFragment";
 
     private ThemeItem mThemeItem;
-    private ThemeAccent mThemeAccent;
     private ThemePreviewInterface mCallback;
     private View view;
     private Bundle themeTargetBundle;
@@ -115,12 +113,6 @@ public class ThemePreviewFragment extends Fragment {
         updateViewForTheme();
     }
 
-    public void setThemeAccent(ThemeAccent themeAccent) {
-        mThemeAccent = themeAccent;
-        updateThemeBase(mThemeAccent);
-        updateViewForAccent();
-    }
-
     private void updateThemeBase(ThemeBase themeBase) {
         // base info
         tvTitle.setText(themeBase.getTitle());
@@ -176,16 +168,6 @@ public class ThemePreviewFragment extends Fragment {
             previewLayout.setVisibility(View.GONE);
         }
 
-    }
-
-    private void updateViewForAccent() {
-        imageBanner.setImageResource(R.drawable.theme_accent_banner);
-        imageBanner.setBackgroundColor(mThemeAccent.getAccentColor());
-        wallpaperLayout.setVisibility(View.GONE);
-        soundLayout.setVisibility(View.GONE);
-        appLayout.setVisibility(View.GONE);
-        previewLayout.setVisibility(View.GONE);
-        themeTargetBundle.putBoolean("android", true);
     }
 
     private void addSwitch(LinearLayout layout, final String id, int text) {

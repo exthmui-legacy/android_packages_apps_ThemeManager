@@ -28,8 +28,6 @@ public class Constants {
     // Theme data
     public final static String THEME_DATA_FLAG = "exthmui_theme";
     public final static String THEME_DATA_OVERLAY_FLAG = "exthmui_theme_overlay";
-    public final static String THEME_DATA_ACCENT_AUTHOR = "LineageOS";
-    public final static String THEME_DATA_ACCENT_COLOR = "lineage_berry_accent_preview";
     public final static String THEME_DATA_TITLE = "theme_title";
     public final static String THEME_DATA_AUTHOR = "theme_author";
     public final static String THEME_DATA_IMAGE = "theme_image";

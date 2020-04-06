@@ -159,7 +159,7 @@ public class ThemePickerActivity extends FragmentActivity implements ThemePicker
 
     @Override
     public void updateThemeList() {
-        mThemeDataBinder.updateThemeList(mPreferences.getBoolean(Constants.PREFERENCES_LIST_ACCENT_PACKAGES, true));
+        mThemeDataBinder.updateThemeList();
     }
 
     @Override
@@ -182,10 +182,8 @@ public class ThemePickerActivity extends FragmentActivity implements ThemePicker
 
     private void showPreferencesDialog() {
         View view = LayoutInflater.from(this).inflate(R.layout.preferences_dialog, null);
-        Switch listAccentPackages = view.findViewById(R.id.preferences_list_accent_packages);
         Switch overlayUninstallFlag = view.findViewById(R.id.preferences_overlay_uninstall_flag);
 
-        listAccentPackages.setChecked(mPreferences.getBoolean(Constants.PREFERENCES_LIST_ACCENT_PACKAGES, true));
         overlayUninstallFlag.setChecked(mPreferences.getBoolean(Constants.PREFERENCES_OVERLAY_REMOVE_FLAG, false));
 
         new AlertDialog.Builder(this)
@@ -193,8 +191,6 @@ public class ThemePickerActivity extends FragmentActivity implements ThemePicker
                 .setView(view)
                 .setOnDismissListener(dialogInterface -> {
                     mPreferences.edit()
-                            .putBoolean(Constants.PREFERENCES_LIST_ACCENT_PACKAGES,
-                                    listAccentPackages.isChecked())
                             .putBoolean(Constants.PREFERENCES_OVERLAY_REMOVE_FLAG,
                                     overlayUninstallFlag.isChecked())
                             .apply();

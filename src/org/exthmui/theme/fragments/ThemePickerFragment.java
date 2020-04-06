@@ -32,7 +32,6 @@ import androidx.fragment.app.Fragment;
 import org.exthmui.theme.R;
 import org.exthmui.theme.adapters.CommonAdapter;
 import org.exthmui.theme.interfaces.ThemePickerInterface;
-import org.exthmui.theme.models.ThemeAccent;
 import org.exthmui.theme.models.ThemeBase;
 
 import java.util.List;
@@ -93,16 +92,8 @@ public class ThemePickerFragment extends Fragment {
         public void bindView(ViewHolder holder, ThemeBase obj) {
             holder.setImageResource(R.id.theme_card_image, R.drawable.theme_default_src);
             new Thread(() -> {
-                if (obj instanceof ThemeAccent) {
-                    getActivity().runOnUiThread(() -> {
-                        holder.setImageResource(R.id.theme_card_image, R.drawable.theme_accent_image);
-                        holder.setBackgroundColor(R.id.theme_card_image, ((ThemeAccent) obj).getAccentColor());
-                    });
-                } else {
-                    Drawable drawable =  mCallback.getThemeImage(obj.getPackageName());
-                    getActivity().runOnUiThread(() -> holder.setImageResource(R.id.theme_card_image, drawable));
-                }
-
+                Drawable drawable =  mCallback.getThemeImage(obj.getPackageName());
+                getActivity().runOnUiThread(() -> holder.setImageResource(R.id.theme_card_image, drawable));
             }).start();
 
             holder.setText(R.id.theme_card_title, obj.getTitle());
