@@ -42,7 +42,10 @@ import org.exthmui.theme.utils.SoundUtil;
 import org.exthmui.theme.utils.WallpaperUtil;
 
 import java.io.InputStream;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -53,7 +56,7 @@ public class ThemeManageService extends Service {
 
     private IOverlayManager mOverlayService;
     private PackageManager mPackageManager;
-    private ThemeApplyStatusListener mApplyStatusListener;
+    private Map<ThemeApplyStatusListener, Boolean> mApplyStatusListenerMap;
     private Queue<Intent> mApplyStatusQueue;
 
     @Override
@@ -61,6 +64,7 @@ public class ThemeManageService extends Service {
         mOverlayService = IOverlayManager.Stub.asInterface(ServiceManager.getService("overlay"));
         mPackageManager = getPackageManager();
         mApplyStatusQueue = new LinkedBlockingQueue<>();
+        mApplyStatusListenerMap = new HashMap<>();
     }
 
     @Override
@@ -77,14 +81,19 @@ public class ThemeManageService extends Service {
             IRemoveThemeOverlays(bundle);
         }
 
-        public void setThemeApplyStatusListener(ThemeApplyStatusListener listener) {
-            mApplyStatusListener = listener;
+        public void addThemeApplyStatusListener(ThemeApplyStatusListener listener) {
+            mApplyStatusListenerMap.put(listener, true);
             notifyThemeApplyStatus();
+        }
+
+        public void removeThemeApplyStatusListener(ThemeApplyStatusListener listener) {
+            mApplyStatusListenerMap.put(listener, false);
         }
     }
 
     public interface ThemeApplyStatusListener {
-        void update(Intent data);
+        // returns true when data is successfully processed
+        boolean update(Intent data);
     }
 
     private void IRemoveThemeOverlays(Bundle bundle) {
@@ -302,8 +311,19 @@ public class ThemeManageService extends Service {
     }
 
     private void notifyThemeApplyStatus() {
-        while (!mApplyStatusQueue.isEmpty() && mApplyStatusListener != null) {
-            mApplyStatusListener.update(mApplyStatusQueue.poll());
+        while (!mApplyStatusQueue.isEmpty() && !mApplyStatusListenerMap.isEmpty()) {
+            boolean popFlag = false;
+            Intent data = mApplyStatusQueue.peek();
+            Iterator<Map.Entry<ThemeApplyStatusListener, Boolean>> iterator = mApplyStatusListenerMap.entrySet().iterator();
+            while (iterator.hasNext()) {
+                Map.Entry<ThemeApplyStatusListener, Boolean> entry = iterator.next();
+                if (!entry.getValue()) {
+                    iterator.remove();
+                    continue;
+                }
+                if (entry.getKey().update(data)) popFlag = true;
+            }
+            if (popFlag) mApplyStatusQueue.poll();
         }
     }
 

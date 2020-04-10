@@ -48,6 +48,7 @@ public class ThemePreviewActivity extends FragmentActivity implements ThemePrevi
     private ThemeDataConn mThemeDataConn;
     private ThemeManageService.ThemeManageBinder mThemeManageBinder;
     private ThemeManageConn mThemeManageConn;
+    private ThemeManageService.ThemeApplyStatusListener mThemeApplyStatusListener;
 
     private String mThemePackageName;
     private ThemePreviewFragment mFragment;
@@ -99,9 +100,9 @@ public class ThemePreviewActivity extends FragmentActivity implements ThemePrevi
         }
         if (mThemeManageConn != null) {
             try {
-                mThemeManageBinder.setThemeApplyStatusListener(null);
+                mThemeManageBinder.removeThemeApplyStatusListener(mThemeApplyStatusListener);
             } catch (Exception e) {
-                Log.e(TAG, "Failed to unset theme apply status listener!");
+                Log.e(TAG, "Failed to remove theme apply status listener!");
             }
 
             unbindService(mThemeManageConn);
@@ -148,11 +149,13 @@ public class ThemePreviewActivity extends FragmentActivity implements ThemePrevi
         @Override
         public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
             mThemeManageBinder = (ThemeManageService.ThemeManageBinder) iBinder;
-            mThemeManageBinder.setThemeApplyStatusListener(data -> {
-                if (mFragment == null || mApplyingDialog == null) return;
+            mThemeApplyStatusListener = data -> {
+                if (mFragment == null || mApplyingDialog == null) return false;
                 sendBroadcast(data);
                 runOnUiThread(() -> mApplyingDialog.updateData(data));
-            });
+                return true;
+            };
+            mThemeManageBinder.addThemeApplyStatusListener(mThemeApplyStatusListener);
         }
 
         @Override
