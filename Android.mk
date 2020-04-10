@@ -10,7 +10,8 @@ LOCAL_USE_AAPT2 := true
 
 LOCAL_STATIC_ANDROID_LIBRARIES := \
     com.google.android.material_material \
-	androidx.appcompat_appcompat
+	androidx.appcompat_appcompat \
+	androidx.preference_preference
 
 LOCAL_RESOURCE_DIR := \
     $(LOCAL_PATH)/res
