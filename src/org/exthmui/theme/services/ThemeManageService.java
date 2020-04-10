@@ -285,7 +285,7 @@ public class ThemeManageService extends Service {
             PackageInfo pi = mPackageManager.getPackageInfo(packageName, PackageManager.GET_META_DATA);
             ApplicationInfo ai = pi.applicationInfo;
             ret =  pi.isOverlayPackage() &&
-                    ((ai.flags & ApplicationInfo.FLAG_HAS_CODE) == 0) &&
+                    ((ai.flags & ApplicationInfo.FLAG_HAS_CODE) == 0) && ai.metaData != null &&
                     ((ai.metaData.getBoolean(Constants.THEME_DATA_OVERLAY_FLAG, false)));
         } catch (Exception e) {
             Log.e(TAG, "check package " + packageName + " failed");
