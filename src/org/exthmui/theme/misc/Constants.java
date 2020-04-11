@@ -27,7 +27,7 @@ public class Constants {
 
     // Theme data
     public final static String THEME_DATA_FLAG = "exthmui_theme";
-    public final static String THEME_DATA_OVERLAY_FLAG = "exthmui_theme_overlay";
+    public final static String THEME_DATA_OVERLAY_FLAG = "is_theme_overlay";
     public final static String THEME_DATA_TITLE = "theme_title";
     public final static String THEME_DATA_AUTHOR = "theme_author";
     public final static String THEME_DATA_IMAGE = "theme_image";
