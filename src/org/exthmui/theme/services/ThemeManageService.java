@@ -112,11 +112,6 @@ public class ThemeManageService extends Service {
             ApplicationInfo ai = pkgInfo.applicationInfo;
 
             if (isThemeOverlayPackage(pkgInfo.packageName)) {
-
-                if (bundle != null && !bundle.getBoolean(pkgInfo.overlayTarget, true)) {
-                    continue;
-                }
-
                 //disable
                 try {
                     mOverlayService.setEnabled(ai.packageName, false, userId);
