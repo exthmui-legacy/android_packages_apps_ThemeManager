@@ -22,3 +22,20 @@ LOCAL_CERTIFICATE := platform
 LOCAL_PRIVILEGED_MODULE := true
 
 include $(BUILD_PACKAGE)
+
+include $(CLEAR_VARS)
+LOCAL_MODULE := ThemeManagerStudio
+LOCAL_MODULE_CLASS := FAKE
+LOCAL_MODULE_SUFFIX := -timestamp
+theme_manager_system_deps := $(call java-lib-deps,framework)
+theme_manager_system_libs_path := $(abspath $(LOCAL_PATH))/system_libs
+
+include $(BUILD_SYSTEM)/base_rules.mk
+
+$(LOCAL_BUILT_MODULE): $(theme_manager_system_deps)
+	$(hide) mkdir -p $(theme_manager_system_libs_path)
+	$(hide) rm -rf $(theme_manager_system_libs_path)/*.jar
+	$(hide) cp $(theme_manager_system_deps) $(theme_manager_system_libs_path)/framework.jar
+	$(hide) echo "Fake: $@"
+	$(hide) mkdir -p $(dir $@)
+	$(hide) touch $@
