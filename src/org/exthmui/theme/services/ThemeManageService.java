@@ -201,7 +201,7 @@ public class ThemeManageService extends Service {
             setThemeApplyStatus(Constants.THEME_APPLYING_RINGTONE, theme);
             try {
                 InputStream is = themeAssetManager.open(Constants.THEME_DATA_ASSETS_SOUNDS + "/" + theme.getRingtone());
-                SoundUtil.setRingtone(this, theme.getRingtone(), is, SoundUtil.TYPE_RINGTONE);
+                if (!SoundUtil.setRingtone(this, theme.getRingtone(), is, SoundUtil.TYPE_RINGTONE)) return false;
             } catch (IOException e) {
                 e.printStackTrace();
                 return false;
@@ -212,7 +212,7 @@ public class ThemeManageService extends Service {
             setThemeApplyStatus(Constants.THEME_APPLYING_ALARM, theme);
             try {
                 InputStream is = themeAssetManager.open(Constants.THEME_DATA_ASSETS_SOUNDS + "/" + theme.getAlarmSound());
-                SoundUtil.setRingtone(this, theme.getAlarmSound(), is, SoundUtil.TYPE_ALARM);
+                if (!SoundUtil.setRingtone(this, theme.getAlarmSound(), is, SoundUtil.TYPE_ALARM)) return false;
             } catch (IOException e) {
                 e.printStackTrace();
                 return false;
@@ -223,7 +223,7 @@ public class ThemeManageService extends Service {
             setThemeApplyStatus(Constants.THEME_APPLYING_NOTIFICATION, theme);
             try {
                 InputStream is = themeAssetManager.open(Constants.THEME_DATA_ASSETS_SOUNDS + "/" + theme.getNotificationSound());
-                SoundUtil.setRingtone(this, theme.getNotificationSound(), is, SoundUtil.TYPE_NOTIFICATION);
+                if (!SoundUtil.setRingtone(this, theme.getNotificationSound(), is, SoundUtil.TYPE_NOTIFICATION)) return false;
             } catch (IOException e) {
                 e.printStackTrace();
                 return false;

@@ -18,10 +18,12 @@ package org.exthmui.theme.utils;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.provider.MediaStore;
-import android.util.Log;
+
+import androidx.preference.PreferenceManager;
 
 import java.io.File;
 import java.io.IOException;
@@ -35,52 +37,71 @@ public class SoundUtil {
     public final static int TYPE_NOTIFICATION = RingtoneManager.TYPE_NOTIFICATION;
     public final static int TYPE_RINGTONE = RingtoneManager.TYPE_RINGTONE;
 
-    public static void setSound(Context context, File file, int type) {
+    public static boolean setRingtone(Context context, String fileName, InputStream inputStream, int type) {
+
+        // create new file
+        File mediaFile = new File(context.getExternalFilesDir("sounds") + "/" + System.currentTimeMillis() + "_" + fileName);
+        FileUtil.createPath(mediaFile);
+        try {
+            FileUtil.saveInputStream(mediaFile.getAbsolutePath(), inputStream);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false;
+        }
+
+        int extPos = fileName.indexOf(".");
+        if (extPos == -1) extPos = fileName.length() - 1;
+        String title = fileName.substring(0, extPos);
 
         ContentValues values = new ContentValues();
-        values.put(MediaStore.MediaColumns.DATA, file.getAbsolutePath());
-        values.put(MediaStore.MediaColumns.TITLE, file.getName());
-        values.put(MediaStore.MediaColumns.SIZE, file.length());
+        values.put(MediaStore.MediaColumns.DATA, mediaFile.getAbsolutePath());
+        values.put(MediaStore.MediaColumns.TITLE, title);
         values.put(MediaStore.MediaColumns.MIME_TYPE, "audio/*");
         values.put(MediaStore.Audio.AudioColumns.IS_RINGTONE, false);
         values.put(MediaStore.Audio.AudioColumns.IS_NOTIFICATION, false);
         values.put(MediaStore.Audio.AudioColumns.IS_ALARM, false);
         values.put(MediaStore.Audio.AudioColumns.IS_MUSIC, false);
 
+        String typeString = "";
         switch (type) {
             case TYPE_ALARM:
+                typeString = "alarm";
                 values.put(MediaStore.Audio.AudioColumns.IS_ALARM, true);
                 break;
             case TYPE_NOTIFICATION:
+                typeString = "notification";
                 values.put(MediaStore.Audio.AudioColumns.IS_NOTIFICATION, true);
                 break;
             case TYPE_RINGTONE:
+                typeString = "ringtone";
                 values.put(MediaStore.Audio.AudioColumns.IS_RINGTONE, true);
                 break;
+            default:
+                return false;
         }
 
-        Uri uri = MediaStore.Audio.Media.getContentUriForPath(file.getAbsolutePath());
-        context.getContentResolver().delete(uri, MediaStore.MediaColumns.DATA + "=\"" + file.getAbsolutePath() + "\"", null);
-        Uri newUri = context.getContentResolver().insert(uri, values);
+        // remove old ringtone
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+        String oldRingtoneTitle = preferences.getString("applied_title_" + typeString, "no_ringtone");
+        String oldRingtoneFile = preferences.getString("applied_file_" + typeString, "no_ringtone");
+        context.getContentResolver().delete(
+                MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
+                MediaStore.MediaColumns.TITLE + " = ?",
+                new String[] {oldRingtoneTitle});
+        new File(oldRingtoneFile).delete();
 
-        RingtoneManager.setActualDefaultRingtoneUri(context, type, newUri);
-    }
-
-    public static void setRingtone(Context context, String name, InputStream inputStream, int type) throws IOException {
-        String ringtonePath = SoundUtil.getRingtonePath(context, name);
-
-        FileUtil.createPath(ringtonePath);
-        FileUtil.saveInputStream(ringtonePath, inputStream);
-        SoundUtil.setSound(context, new File(ringtonePath) , type);
-    }
-
-    public static String getRingtonePath(Context context, String ringtoneName) {
-        try {
-            return context.getExternalCacheDir().getPath() + "/ringtone/" + ringtoneName;
-        } catch (Exception e) {
-            Log.e(TAG, "Failed to get path of ringtone cache");
-            return "";
+        Uri uri = context.getContentResolver().insert(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, values);
+        if (type == TYPE_RINGTONE) {
+            RingtoneManager.setActualDefaultRingtoneUriBySlot(context, type, uri, 1);
+            RingtoneManager.setActualDefaultRingtoneUriBySlot(context, type, uri, 2);
+        } else {
+            RingtoneManager.setActualDefaultRingtoneUri(context, type, uri);
         }
+
+        preferences.edit().putString("applied_title_" + typeString, title).apply();
+        preferences.edit().putString("applied_file_" + typeString, mediaFile.getAbsolutePath()).apply();
+
+        return true;
     }
 
 }

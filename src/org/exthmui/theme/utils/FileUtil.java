@@ -39,8 +39,7 @@ public class FileUtil {
         inputStream.close();
     }
 
-    public static void createPath(String path) {
-        File file = new File(path);
+    public static void createPath(File file) {
         File parent = file.getParentFile();
 
         if (!parent.exists()) {
