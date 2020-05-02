@@ -40,7 +40,9 @@
     <string name="skin_apply_status_notification">Applying notification sound</string>
     <string name="skin_apply_status_wallpaper">Applying wallpaper</string>
     <string name="skin_apply_status_lockscreen">Applying lockscreen wallpaper</string>
+    <string name="skin_apply_status_installing_overlay">Installing overlay</string>
     <string name="skin_apply_status_overlay">Applying theme to %1$s</string>
+    <string name="skin_apply_status_cleaning">Cleaning</string>
     <string name="skin_apply_status_succeed">%1$s applied successfully</string>
     <string name="skin_apply_status_failed">Failed to apply %1$s</string>
 

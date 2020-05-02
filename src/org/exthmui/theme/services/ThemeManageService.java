@@ -41,7 +41,9 @@ import org.exthmui.theme.utils.PackageUtil;
 import org.exthmui.theme.utils.SoundUtil;
 import org.exthmui.theme.utils.WallpaperUtil;
 
+import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -74,11 +76,14 @@ public class ThemeManageService extends Service {
 
     public class ThemeManageBinder extends Binder {
         public boolean applyTheme(ThemeItem theme, Bundle bundle) {
-            return IApplyTheme(theme, bundle);
-        }
-
-        public void removeThemeOverlays(Bundle bundle) {
-            IRemoveThemeOverlays(bundle);
+            setThemeApplyStatus(Constants.THEME_APPLYING, theme);
+            boolean ret = IApplyTheme(theme, bundle);
+            if (ret) {
+                setThemeApplyStatus(Constants.THEME_APPLY_SUCCEED, theme);
+            } else {
+                setThemeApplyStatus(Constants.THEME_APPLY_FAILED, theme);
+            }
+            return ret;
         }
 
         public void addThemeApplyStatusListener(ThemeApplyStatusListener listener) {
@@ -96,182 +101,175 @@ public class ThemeManageService extends Service {
         boolean update(Intent data);
     }
 
-    private void IRemoveThemeOverlays(Bundle bundle) {
-
-        List<PackageInfo> allPackages = mPackageManager.getInstalledPackages(0);
-        boolean uninstallFlag = false;
-        if (bundle != null) {
-            uninstallFlag = bundle.getBoolean(Constants.PREFERENCES_OVERLAY_REMOVE_FLAG);
-        }
-
-        int userId = UserHandle.myUserId();
-        final AtomicBoolean removeResult = new AtomicBoolean();
-        removeResult.set(false);
-
-        for (PackageInfo pkgInfo : allPackages) {
-            ApplicationInfo ai = pkgInfo.applicationInfo;
-
-            if (isThemeOverlayPackage(pkgInfo.packageName)) {
-                //disable
-                try {
-                    mOverlayService.setEnabled(ai.packageName, false, userId);
-                } catch (RemoteException e) {
-                    Log.e(TAG, "Failed to disable overlay " + ai.packageName);
-                }
-
-                // uninstall
-                if (uninstallFlag) {
-                    synchronized (removeResult) {
-                        PackageUtil.uninstallPackage(this, ai.packageName, new PackageUtil.PackageInstallerCallback() {
-                            @Override
-                            public void onSuccess(String packageName) {
-                                synchronized (removeResult) {
-                                    removeResult.set(true);
-                                    removeResult.notify();
-                                }
-                            }
-
-                            @Override
-                            public void onFailure(String packageName, int code) {
-                                synchronized (removeResult) {
-                                    removeResult.set(false);
-                                    removeResult.notify();
-                                }
-                            }
-                        });
-
-                        try {
-                            removeResult.wait();
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }
-            }
-        }
-    }
-
     private boolean IApplyTheme(ThemeItem theme, Bundle bundle) {
         final int userId = UserHandle.myUserId();
-        boolean ret = true;
-        mApplyStatusQueue.clear();
+        final boolean uninstallFlag = bundle.getBoolean(Constants.PREFERENCES_OVERLAY_REMOVE_FLAG);
 
+        List<OverlayTarget> overlayTargetPackages = theme.getOverlayTargets();
+        Map<String, String> themeOverlays = new HashMap<>();
+
+        Resources themeResources;
         try {
-            List<OverlayTarget> overlayTargetPackages = theme.getOverlayTargets();
-            Resources themeResources = mPackageManager.getResourcesForApplication(theme.getPackageName());
-            AssetManager themeAssetManager = themeResources.getAssets();
+            themeResources = mPackageManager.getResourcesForApplication(theme.getPackageName());
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+            return false;
+        }
 
-            setThemeApplyStatus(Constants.THEME_APPLYING, theme);
+        AssetManager themeAssetManager = themeResources.getAssets();
 
-            IRemoveThemeOverlays(bundle);
-
-            if (theme.hasRingtone() && bundle.getBoolean(Constants.THEME_TARGET_RINGTONE)) {
-                setThemeApplyStatus(Constants.THEME_APPLYING_RINGTONE, theme);
-                InputStream is = themeAssetManager.open(Constants.THEME_DATA_ASSETS_SOUNDS + "/" + theme.getRingtone());
-                SoundUtil.setRingtone(this, theme.getRingtone(), is, SoundUtil.TYPE_RINGTONE);
+        // install overlay
+        if (!overlayTargetPackages.isEmpty()) setThemeApplyStatus(Constants.THEME_INSTALLING_OVERLAY, theme);
+        for (OverlayTarget ovt : overlayTargetPackages) {
+            if (!bundle.getBoolean(ovt.getPackageName())) {
+                continue;
+            }
+            InputStream is;
+            try {
+                is = themeAssetManager.open(Constants.THEME_DATA_ASSETS_OVERLAY + "/" + ovt.getPackageName());
+            } catch (IOException e) {
+                e.printStackTrace();
+                return false;
             }
 
-            if (theme.hasAlarmSound() && bundle.getBoolean(Constants.THEME_TARGET_ALARM)) {
-                setThemeApplyStatus(Constants.THEME_APPLYING_ALARM, theme);
-                InputStream is = themeAssetManager.open(Constants.THEME_DATA_ASSETS_SOUNDS + "/" + theme.getAlarmSound());
-                SoundUtil.setRingtone(this, theme.getAlarmSound(), is, SoundUtil.TYPE_ALARM);
-            }
+            final AtomicBoolean installResult = new AtomicBoolean();
 
-            if (theme.hasNotificationSound() && bundle.getBoolean(Constants.THEME_TARGET_NOTIFICATION)) {
-                setThemeApplyStatus(Constants.THEME_APPLYING_NOTIFICATION, theme);
-                InputStream is = themeAssetManager.open(Constants.THEME_DATA_ASSETS_SOUNDS + "/" + theme.getNotificationSound());
-                SoundUtil.setRingtone(this, theme.getNotificationSound(), is, SoundUtil.TYPE_NOTIFICATION);
-            }
+            synchronized (installResult) {
+                PackageUtil.installPackage(this, is, new PackageUtil.PackageInstallerCallback() {
+                    @Override
+                    public void onSuccess(String packageName) {
+                        // check installed package for security reasons
+                        if (!isThemeOverlayPackage(packageName)) {
+                            Log.w(TAG, "Package " + packageName + " is not a verified overlay package!");
+                            onFailure(packageName, 0);
+                            return;
+                        }
+                        themeOverlays.put(ovt.getPackageName(), packageName);
+                        synchronized (installResult) {
+                            installResult.set(true);
+                            installResult.notify();
+                        }
+                    }
 
-            if (theme.hasWallpaper() && bundle.getBoolean(Constants.THEME_TARGET_WALLPAPER)) {
-                setThemeApplyStatus(Constants.THEME_APPLYING_WALLPAPER, theme);
+                    @Override
+                    public void onFailure(String packageName, int code) {
+                        synchronized (installResult) {
+                            installResult.set(false);
+                            installResult.notify();
+                        }
+                    }
+                });
+
+                try {
+                    installResult.wait();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                    return false;
+                }
+
+                if (!installResult.get()) {
+                    return false;
+                }
+            }
+        }
+
+        // wallpaper and lockscreen
+        if (theme.hasWallpaper() && bundle.getBoolean(Constants.THEME_TARGET_WALLPAPER)) {
+            setThemeApplyStatus(Constants.THEME_APPLYING_WALLPAPER, theme);
+            try {
                 InputStream is = themeAssetManager.open(Constants.THEME_DATA_ASSETS_BACKGROUNDS + "/" + theme.getWallpaper());
                 WallpaperUtil.setWallpaper(this, is);
+            } catch (IOException e) {
+                e.printStackTrace();
+                return false;
             }
+        }
 
-            if (theme.hasLockScreen() && bundle.getBoolean(Constants.THEME_TARGET_LOCKSCREEN)) {
-                setThemeApplyStatus(Constants.THEME_APPLYING_LOCKSCREEN, theme);
+        if (theme.hasLockScreen() && bundle.getBoolean(Constants.THEME_TARGET_LOCKSCREEN)) {
+            setThemeApplyStatus(Constants.THEME_APPLYING_LOCKSCREEN, theme);
+            try {
                 InputStream is = themeAssetManager.open(Constants.THEME_DATA_ASSETS_BACKGROUNDS + "/" + theme.getLockScreen());
                 WallpaperUtil.setLockScreen(this, is);
+            } catch (IOException e) {
+                e.printStackTrace();
+                return false;
             }
-
-            int progress = 0;
-            Intent extDataIntent = new Intent();
-            extDataIntent.putExtra("progressMax", overlayTargetPackages.size());
-
-            for (OverlayTarget ovt : overlayTargetPackages) {
-                progress++;
-                if (!bundle.getBoolean(ovt.getPackageName())) {
-                    continue;
-                }
-                extDataIntent.putExtra("progressVal", progress);
-                extDataIntent.putExtra("nowPackageLabel", ovt.getLabel());
-
-                setThemeApplyStatus(Constants.THEME_APPLYING_OVERLAY, theme, extDataIntent);
-
-                // install & enable
-                InputStream is = themeAssetManager.open(Constants.THEME_DATA_ASSETS_OVERLAY + "/" + ovt.getPackageName());
-
-                final AtomicBoolean installResult = new AtomicBoolean();
-                installResult.set(false);
-
-                synchronized (installResult) {
-                    PackageUtil.installPackage(this, is, new PackageUtil.PackageInstallerCallback() {
-                        @Override
-                        public void onSuccess(String packageName) {
-                            // check installed package for security reasons
-                            if (!isThemeOverlayPackage(packageName)) {
-                                Log.w(TAG, "Package " + packageName + " is not a verified overlay package!");
-                                onFailure(packageName, 0);
-                                return;
-                            }
-                            try {
-                                while (mOverlayService.getOverlayInfo(packageName, userId) == null) {
-                                    Thread.sleep(50);
-                                }
-                                mOverlayService.setEnabled(packageName, true, userId);
-                            } catch (Exception e) {
-                                Log.e(TAG, "Failed to enable overlay " + packageName);
-                                onFailure(packageName, 0);
-                                return;
-                            }
-                            synchronized (installResult) {
-                                installResult.set(true);
-                                installResult.notify();
-                            }
-                        }
-
-                        @Override
-                        public void onFailure(String packageName, int code) {
-                            IRemoveThemeOverlays(bundle);
-
-                            synchronized (installResult) {
-                                installResult.set(false);
-                                installResult.notify();
-                            }
-                        }
-                    });
-
-                    installResult.wait();
-
-                    if (!installResult.get()) {
-                        ret = false;
-                        break;
-                    }
-                }
-            }
-
-        } catch (Exception e) {
-            Log.e(TAG, "Failed to apply theme " + theme.getPackageName());
-            ret = false;
         }
 
-        if (ret) {
-            setThemeApplyStatus(Constants.THEME_APPLY_SUCCEED, theme);
-        } else {
-            setThemeApplyStatus(Constants.THEME_APPLY_FAILED, theme);
+        // sounds
+        if (theme.hasRingtone() && bundle.getBoolean(Constants.THEME_TARGET_RINGTONE)) {
+            setThemeApplyStatus(Constants.THEME_APPLYING_RINGTONE, theme);
+            try {
+                InputStream is = themeAssetManager.open(Constants.THEME_DATA_ASSETS_SOUNDS + "/" + theme.getRingtone());
+                SoundUtil.setRingtone(this, theme.getRingtone(), is, SoundUtil.TYPE_RINGTONE);
+            } catch (IOException e) {
+                e.printStackTrace();
+                return false;
+            }
         }
-        return ret;
+
+        if (theme.hasAlarmSound() && bundle.getBoolean(Constants.THEME_TARGET_ALARM)) {
+            setThemeApplyStatus(Constants.THEME_APPLYING_ALARM, theme);
+            try {
+                InputStream is = themeAssetManager.open(Constants.THEME_DATA_ASSETS_SOUNDS + "/" + theme.getAlarmSound());
+                SoundUtil.setRingtone(this, theme.getAlarmSound(), is, SoundUtil.TYPE_ALARM);
+            } catch (IOException e) {
+                e.printStackTrace();
+                return false;
+            }
+        }
+
+        if (theme.hasNotificationSound() && bundle.getBoolean(Constants.THEME_TARGET_NOTIFICATION)) {
+            setThemeApplyStatus(Constants.THEME_APPLYING_NOTIFICATION, theme);
+            try {
+                InputStream is = themeAssetManager.open(Constants.THEME_DATA_ASSETS_SOUNDS + "/" + theme.getNotificationSound());
+                SoundUtil.setRingtone(this, theme.getNotificationSound(), is, SoundUtil.TYPE_NOTIFICATION);
+            } catch (IOException e) {
+                e.printStackTrace();
+                return false;
+            }
+        }
+
+        // enable overlay
+        int progress = 0;
+        Intent extDataIntent = new Intent();
+        extDataIntent.putExtra("progressMax", overlayTargetPackages.size());
+
+        for (OverlayTarget ovt : overlayTargetPackages) {
+            progress++;
+            if (!bundle.getBoolean(ovt.getPackageName())) {
+                continue;
+            }
+            extDataIntent.putExtra("progressVal", progress);
+            extDataIntent.putExtra("nowPackageLabel", ovt.getLabel());
+
+            setThemeApplyStatus(Constants.THEME_APPLYING_OVERLAY, theme, extDataIntent);
+
+            try {
+                mOverlayService.setEnabled(themeOverlays.get(ovt.getPackageName()), true, userId);
+            } catch (RemoteException e) {
+                e.printStackTrace();
+                return false;
+            }
+        }
+
+        // disable and uninstall old overlays
+        setThemeApplyStatus(Constants.THEME_CLEANING, theme);
+        List<PackageInfo> allPackages = mPackageManager.getInstalledPackages(0);
+        for (PackageInfo pkgInfo : allPackages) {
+            if (isThemeOverlayPackage(pkgInfo.packageName) && !themeOverlays.containsValue(pkgInfo.packageName)) {
+                try {
+                    mOverlayService.setEnabled(pkgInfo.packageName, false, userId);
+                } catch (RemoteException e) {
+                    e.printStackTrace();
+                }
+                if (uninstallFlag) {
+                    PackageUtil.uninstallPackage(this, pkgInfo.packageName, null);
+                }
+            }
+        }
+
+        return true;
     }
 
     private boolean isThemeOverlayPackage(String packageName) {

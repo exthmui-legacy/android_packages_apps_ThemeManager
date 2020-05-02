@@ -58,6 +58,8 @@ public class Constants {
     public final static String THEME_APPLYING_WALLPAPER = "APPLYING_WALLPAPER";
     public final static String THEME_APPLYING_LOCKSCREEN = "APPLYING_LOCKSCREEN";
     public final static String THEME_APPLYING_OVERLAY = "APPLYING_OVERLAY";
+    public final static String THEME_INSTALLING_OVERLAY = "INSTALLING_OVERLAY";
+    public final static String THEME_CLEANING = "CLEANING";
 
     // Theme target key
     public final static String THEME_TARGET_WALLPAPER = "theme.wallpaper";

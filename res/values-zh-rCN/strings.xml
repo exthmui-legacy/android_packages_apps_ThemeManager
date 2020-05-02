@@ -49,4 +49,6 @@
     <string name="menu_refresh">刷新</string>
     <string name="menu_preferences">首选项</string>
     <string name="preferences_overlay_uninstall_flag">停用叠加层后将其卸载</string>
+    <string name="skin_apply_status_installing_overlay">正在安装叠加层</string>
+    <string name="skin_apply_status_cleaning">清理中</string>
 </resources>

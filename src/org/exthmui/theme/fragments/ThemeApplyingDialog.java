@@ -134,6 +134,12 @@ public class ThemeApplyingDialog extends DialogFragment {
             case Constants.THEME_APPLYING_LOCKSCREEN:
                 msg = getString(R.string.skin_apply_status_lockscreen);
                 break;
+            case Constants.THEME_INSTALLING_OVERLAY:
+                msg = getString(R.string.skin_apply_status_installing_overlay);
+                break;
+            case Constants.THEME_CLEANING:
+                msg = getString(R.string.skin_apply_status_cleaning);
+                break;
             case Constants.THEME_APPLYING_OVERLAY:
                 max = dialogData.getInt("progressMax", 0);
                 progress = dialogData.getInt("progressVal", 0);
