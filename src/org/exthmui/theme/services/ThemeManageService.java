@@ -37,10 +37,12 @@ import org.exthmui.theme.misc.Constants;
 import org.exthmui.theme.models.OverlayTarget;
 import org.exthmui.theme.models.ThemeBase;
 import org.exthmui.theme.models.ThemeItem;
+import org.exthmui.theme.utils.FileUtil;
 import org.exthmui.theme.utils.PackageUtil;
 import org.exthmui.theme.utils.SoundUtil;
 import org.exthmui.theme.utils.WallpaperUtil;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -224,6 +226,28 @@ public class ThemeManageService extends Service {
             try {
                 InputStream is = themeAssetManager.open(Constants.THEME_DATA_ASSETS_SOUNDS + "/" + theme.getNotificationSound());
                 if (!SoundUtil.setRingtone(this, theme.getNotificationSound(), is, SoundUtil.TYPE_NOTIFICATION)) return false;
+            } catch (IOException e) {
+                e.printStackTrace();
+                return false;
+            }
+        }
+
+        // bootanimation
+        if (theme.hasBootanimation && bundle.getBoolean(Constants.THEME_TARGET_BOOTANIMATION)) {
+            setThemeApplyStatus(Constants.THEME_APPLYING_BOOTANIMATION, theme);
+            try {
+                File bootanimFile = new File(Constants.THEME_DATA_BOOTANIMATION_PATH + "/bootanimation.zip");
+                File darkBootanimFile = new File(Constants.THEME_DATA_BOOTANIMATION_PATH + "/bootanimation-dark.zip");
+                bootanimFile.delete(); darkBootanimFile.delete();
+                InputStream is = themeAssetManager.open(Constants.THEME_DATA_ASSETS_MEDIA + "/bootanimation.zip");
+                FileUtil.saveInputStream(bootanimFile.getAbsolutePath(), is, true);
+                try {
+                    InputStream darkIS = themeAssetManager.open(Constants.THEME_DATA_ASSETS_MEDIA + "/bootanimation-dark.zip");
+                    FileUtil.saveInputStream(darkBootanimFile.getAbsolutePath(), darkIS, true);
+                } catch (IOException e) {
+                    // could not found dark mode animation
+                    Runtime.getRuntime().exec("ln -s " + bootanimFile.getAbsolutePath() + " " + darkBootanimFile.getAbsolutePath());
+                }
             } catch (IOException e) {
                 e.printStackTrace();
                 return false;

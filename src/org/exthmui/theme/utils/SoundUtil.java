@@ -43,7 +43,7 @@ public class SoundUtil {
         File mediaFile = new File(context.getExternalFilesDir("sounds") + "/" + System.currentTimeMillis() + "_" + fileName);
         FileUtil.createPath(mediaFile);
         try {
-            FileUtil.saveInputStream(mediaFile.getAbsolutePath(), inputStream);
+            FileUtil.saveInputStream(mediaFile.getAbsolutePath(), inputStream, false);
         } catch (IOException e) {
             e.printStackTrace();
             return false;

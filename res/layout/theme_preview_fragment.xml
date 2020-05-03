@@ -113,6 +113,18 @@
                     </LinearLayout>
 
                     <LinearLayout
+                        android:id="@+id/others_container"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:orientation="vertical">
+
+                        <TextView
+                            style="@style/skin_preview_subheader"
+                            android:text="@string/separator_others" />
+
+                    </LinearLayout>
+
+                    <LinearLayout
                         android:id="@+id/app_container"
                         android:layout_width="fill_parent"
                         android:layout_height="wrap_content"

@@ -26,6 +26,7 @@ public class ThemeItem extends ThemeBase {
     private String mAlarmSound;
     private String mNotificationSound;
     private String mRingtone;
+    public boolean hasBootanimation = false;
 
     private List<OverlayTarget> mOverlayTargets;
 

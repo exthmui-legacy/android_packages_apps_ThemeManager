@@ -25,7 +25,7 @@ public class FileUtil {
 
     private static final String TAG = "FileUtil";
 
-    public static void saveInputStream(String path, InputStream inputStream) throws IOException {
+    public static void saveInputStream(String path, InputStream inputStream, boolean isThemeData) throws IOException {
         int index;
         byte[] bytes = new byte[1024];
         FileOutputStream fos = new FileOutputStream(path);
@@ -37,6 +37,13 @@ public class FileUtil {
 
         fos.close();
         inputStream.close();
+        if (isThemeData) {
+            try {
+                Runtime.getRuntime().exec("chmod 0644 " + path).waitFor();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     public static void createPath(File file) {

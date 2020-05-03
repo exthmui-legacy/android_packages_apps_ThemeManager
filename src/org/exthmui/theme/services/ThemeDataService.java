@@ -195,6 +195,8 @@ public class ThemeDataService extends Service {
             Resources resources = mPackageManager.getResourcesForApplication(packageName);
             ThemeItem theme = new ThemeItem(packageName) ;
             IGetThemeBaseInfo(theme);
+            int hasBootanimResId = resources.getIdentifier(Constants.THEME_DATA_HAS_BOOTANIM, "bool", packageName);
+            theme.hasBootanimation = (hasBootanimResId != 0) && resources.getBoolean(hasBootanimResId);
 
             Stack<String> xmlTags = new Stack<>();
             List<OverlayTarget> overlayTargetList = new ArrayList<>();

@@ -56,6 +56,7 @@ public class ThemePreviewFragment extends Fragment {
     private LinearLayout previewPicLayout;
     private LinearLayout soundLayout;
     private LinearLayout wallpaperLayout;
+    private LinearLayout othersLayout;
     private TextView tvTitle;
     private TextView tvAuthor;
     private ImageView imageBanner;
@@ -84,6 +85,7 @@ public class ThemePreviewFragment extends Fragment {
         previewPicLayout = view.findViewById(R.id.layout_preview_pic);
         soundLayout = view.findViewById(R.id.sound_container);
         wallpaperLayout = view.findViewById(R.id.wallpaper_container);
+        othersLayout = view.findViewById(R.id.others_container);
         tvTitle = view.findViewById(R.id.theme_title);
         tvAuthor = view.findViewById(R.id.theme_author);
         imageBanner = view.findViewById(R.id.banner_image);
@@ -147,6 +149,13 @@ public class ThemePreviewFragment extends Fragment {
 
         if (!mThemeItem.hasRingtone() && !mThemeItem.hasAlarmSound() && !mThemeItem.hasNotificationSound()) {
             soundLayout.setVisibility(View.GONE);
+        }
+
+        // others
+        if (mThemeItem.hasBootanimation) {
+            addSwitch(othersLayout, Constants.THEME_TARGET_BOOTANIMATION, R.string.others_bootanimation);
+        } else {
+            othersLayout.setVisibility(View.GONE);
         }
 
         // apps

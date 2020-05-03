@@ -40,6 +40,7 @@
     <string name="skin_apply_status_notification">Applying notification sound</string>
     <string name="skin_apply_status_wallpaper">Applying wallpaper</string>
     <string name="skin_apply_status_lockscreen">Applying lockscreen wallpaper</string>
+    <string name="skin_apply_status_bootanimation">Applying boot animation</string>
     <string name="skin_apply_status_installing_overlay">Installing overlay</string>
     <string name="skin_apply_status_overlay">Applying theme to %1$s</string>
     <string name="skin_apply_status_cleaning">Cleaning</string>
@@ -53,4 +54,6 @@
     <string name="menu_preferences">Preferences</string>
 
     <string name="preferences_overlay_uninstall_flag">Uninstall the overlay after disabling it</string>
+    <string name="separator_others">Others</string>
+    <string name="others_bootanimation">Boot animation</string>
 </resources>
