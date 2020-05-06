@@ -28,7 +28,12 @@ public class Constants {
     public final static String CHANNEL_APPLY_STATUS = "apply_status";
 
     // DATA
-    public final static String THEME_DATA_BOOTANIMATION_PATH = "data/theme/media/";
+    public final static String THEME_DATA_BOOTANIMATION_PATH = "/data/theme/media/";
+    public final static String THEME_DATA_FONTS_PATH = "/data/theme/fonts/";
+
+    // fonts
+    public final static String FAKE_FONTS_OVERLAY = "org.exthmui.theme.fakefonts";
+    public final static String PROP_REFRESH_FONTS = "sys.refresh_fonts";
 
     // Theme data
     public final static String THEME_DATA_FLAG = "exthmui_theme";
@@ -38,9 +43,11 @@ public class Constants {
     public final static String THEME_DATA_IMAGE = "theme_image";
     public final static String THEME_DATA_BANNER = "theme_banner";
     public final static String THEME_DATA_HAS_BOOTANIM = "has_bootanimation";
+    public final static String THEME_DATA_HAS_FONTS = "has_fonts";
     public final static String THEME_DATA_ASSETS_SOUNDS = "sounds";
     public final static String THEME_DATA_ASSETS_BACKGROUNDS = "backgrounds";
     public final static String THEME_DATA_ASSETS_PREVIEWS = "previews";
+    public final static String THEME_DATA_ASSETS_FONTS = "fonts";
     public final static String THEME_DATA_ASSETS_MEDIA = "media";
     public final static String THEME_DATA_ASSETS_OVERLAY = "overlay";
     public final static String THEME_DATA_XML_FILE = "theme_data";
@@ -65,6 +72,7 @@ public class Constants {
     public final static String THEME_APPLYING_WALLPAPER = "APPLYING_WALLPAPER";
     public final static String THEME_APPLYING_LOCKSCREEN = "APPLYING_LOCKSCREEN";
     public final static String THEME_APPLYING_BOOTANIMATION = "APPLYING_BOOTANIMATION";
+    public final static String THEME_APPLYING_FONTS = "APPLYING_FONTS";
     public final static String THEME_APPLYING_OVERLAY = "APPLYING_OVERLAY";
     public final static String THEME_INSTALLING_OVERLAY = "INSTALLING_OVERLAY";
     public final static String THEME_CLEANING = "CLEANING";
@@ -76,6 +84,7 @@ public class Constants {
     public final static String THEME_TARGET_NOTIFICATION = "theme.notification";
     public final static String THEME_TARGET_RINGTONE = "theme.ringtone";
     public final static String THEME_TARGET_BOOTANIMATION = "theme.bootanimation";
+    public final static String THEME_TARGET_FONTS = "theme.fonts";
 
     // Preferences key
     public final static String PREFERENCES_OVERLAY_REMOVE_FLAG = "overlay_uninstall_flag";

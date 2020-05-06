@@ -154,7 +154,11 @@ public class ThemePreviewFragment extends Fragment {
         // others
         if (mThemeItem.hasBootanimation) {
             addSwitch(othersLayout, Constants.THEME_TARGET_BOOTANIMATION, R.string.others_bootanimation);
-        } else {
+        }
+        if (mThemeItem.hasFonts) {
+            addSwitch(othersLayout, Constants.THEME_TARGET_FONTS, R.string.others_fonts);
+        }
+        if (!mThemeItem.hasFonts && !mThemeItem.hasBootanimation){
             othersLayout.setVisibility(View.GONE);
         }
 

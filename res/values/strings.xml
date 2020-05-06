@@ -56,4 +56,6 @@
     <string name="preferences_overlay_uninstall_flag">Uninstall the overlay after disabling it</string>
     <string name="separator_others">Others</string>
     <string name="others_bootanimation">Boot animation</string>
+    <string name="others_fonts">Fonts</string>
+    <string name="skin_apply_status_fonts">Applying fonts</string>
 </resources>

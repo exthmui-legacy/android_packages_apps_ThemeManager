@@ -20,6 +20,7 @@ LOCAL_PACKAGE_NAME := ThemeManager
 LOCAL_PRIVATE_PLATFORM_APIS := true
 LOCAL_CERTIFICATE := platform
 LOCAL_PRIVILEGED_MODULE := true
+LOCAL_REQUIRED_MODULES := FakeFontsOverlay
 
 include $(BUILD_PACKAGE)
 
@@ -39,3 +40,5 @@ $(LOCAL_BUILT_MODULE): $(theme_manager_system_deps)
 	$(hide) echo "Fake: $@"
 	$(hide) mkdir -p $(dir $@)
 	$(hide) touch $@
+
+-include $(LOCAL_PATH)/fakefonts/Android.mk

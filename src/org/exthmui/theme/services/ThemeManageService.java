@@ -30,6 +30,7 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.os.RemoteException;
 import android.os.ServiceManager;
+import android.os.SystemProperties;
 import android.os.UserHandle;
 import android.util.Log;
 
@@ -45,6 +46,7 @@ import org.exthmui.theme.utils.WallpaperUtil;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -249,6 +251,39 @@ public class ThemeManageService extends Service {
                     Runtime.getRuntime().exec("ln -s " + bootanimFile.getAbsolutePath() + " " + darkBootanimFile.getAbsolutePath());
                 }
             } catch (IOException e) {
+                e.printStackTrace();
+                return false;
+            }
+        }
+
+        // fonts
+        if (theme.hasFonts && bundle.getBoolean(Constants.THEME_TARGET_FONTS)) {
+            setThemeApplyStatus(Constants.THEME_APPLYING_FONTS, theme);
+            File fontDir = new File(Constants.THEME_DATA_FONTS_PATH);
+            File[] existFontFiles = fontDir.listFiles();
+            if (existFontFiles != null) {
+                for (File fontFile : existFontFiles) fontFile.delete();
+            }
+            try {
+                String[] fontsArray = themeAssetManager.list(Constants.THEME_DATA_ASSETS_FONTS);
+                if (fontsArray != null) {
+                    for (String fileName : fontsArray) {
+                        InputStream is = themeAssetManager.open(Constants.THEME_DATA_ASSETS_FONTS + "/" + fileName);
+                        FileUtil.saveInputStream(Constants.THEME_DATA_FONTS_PATH + fileName, is, true);
+                    }
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+                return false;
+            }
+
+            // use fake-fonts overlay to refresh font cache
+            try {
+                SystemProperties.set(Constants.PROP_REFRESH_FONTS, "true");
+                mOverlayService.setEnabled(Constants.FAKE_FONTS_OVERLAY, true, userId);
+                Thread.sleep(1000);
+                mOverlayService.setEnabled(Constants.FAKE_FONTS_OVERLAY, false, userId);
+            } catch (RemoteException | InterruptedException e) {
                 e.printStackTrace();
                 return false;
             }
