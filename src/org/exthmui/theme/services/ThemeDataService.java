@@ -36,10 +36,12 @@ import org.exthmui.theme.models.OverlayTarget;
 import org.exthmui.theme.models.ThemeBase;
 import org.exthmui.theme.models.ThemeItem;
 
+import org.xmlpull.v1.XmlPullParserException;
+
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Stack;
 
 public class ThemeDataService extends Service {
 
@@ -191,7 +193,6 @@ public class ThemeDataService extends Service {
 
     private ThemeItem IGetThemeItem(String packageName) {
         try {
-            DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
             Resources resources = mPackageManager.getResourcesForApplication(packageName);
             ThemeItem theme = new ThemeItem(packageName) ;
             IGetThemeBaseInfo(theme);
@@ -200,82 +201,24 @@ public class ThemeDataService extends Service {
             int hasFontsResId = resources.getIdentifier(Constants.THEME_DATA_HAS_FONTS, "bool", packageName);
             theme.hasFonts = (hasFontsResId != 0) && resources.getBoolean(hasFontsResId);
 
-            Stack<String> xmlTags = new Stack<>();
             List<OverlayTarget> overlayTargetList = new ArrayList<>();
             int themeInfoXmlResId = resources.getIdentifier(Constants.THEME_DATA_XML_FILE, "xml", packageName);
             XmlResourceParser themeInfoXml = resources.getXml(themeInfoXmlResId);
             int eventType = themeInfoXml.getEventType();
-            boolean overlaySwitchable = true;
-            int ratioWidth = -1, ratioHeight = -1;
 
             while (eventType != XmlResourceParser.END_DOCUMENT) {
-                switch (eventType) {
-                    case XmlResourceParser.START_TAG:
-                        xmlTags.push(themeInfoXml.getName().toLowerCase());
-                        switch (xmlTags.peek()) {
-                            case Constants.THEME_DATA_XML_OVERLAY:
-                                overlayTargetList.clear();
-                                break;
-                            case Constants.THEME_DATA_XML_OVERLAY_TARGET:
-                                overlaySwitchable = true;
-                                for (int i = 0; i < themeInfoXml.getAttributeCount(); i++) {
-                                    if (themeInfoXml.getAttributeName(i).equals(Constants.THEME_DATA_XML_OVERLAY_TARGET_ATTR_SWITCHABLE)) {
-                                        overlaySwitchable = themeInfoXml.getAttributeBooleanValue(i, true);
-                                        break;
-                                    }
-                                }
-                                break;
-                            case Constants.THEME_DATA_XML_BACKGROUND_WALLPAPER: case Constants.THEME_DATA_XML_BACKGROUND_LOCKSCREEN:
-                                ratioWidth = ratioHeight = -1;
-                                for (int i = 0; i < themeInfoXml.getAttributeCount(); i++) {
-                                    if (themeInfoXml.getAttributeName(i).equals(Constants.THEME_DATA_XML_BACKGROUND_RATIO_WIDTH)) {
-                                        ratioWidth = themeInfoXml.getAttributeIntValue(i, -1);
-                                    } else if (themeInfoXml.getAttributeName(i).equals(Constants.THEME_DATA_XML_BACKGROUND_RATIO_HEIGHT)) {
-                                        ratioHeight = themeInfoXml.getAttributeIntValue(i, -1);
-                                    }
-                                }
-                                break;
-                        }
-                        break;
-                    case XmlResourceParser.TEXT:
-                        switch (xmlTags.peek()) {
-                            // sounds
-                            case Constants.THEME_DATA_XML_SOUND_RINGTONE:
-                                theme.setRingtone(themeInfoXml.getText());
-                                break;
-                            case Constants.THEME_DATA_XML_SOUND_ALARM:
-                                theme.setAlarmSound(themeInfoXml.getText());
-                                break;
-                            case Constants.THEME_DATA_XML_SOUND_NOTIFICATION:
-                                theme.setNotificationSound(themeInfoXml.getText());
-                                break;
-
-                            // background
-                            case Constants.THEME_DATA_XML_BACKGROUND_WALLPAPER:
-                                if ((ratioHeight == -1 || ratioWidth == -1 && !theme.hasWallpaper()) ||
-                                        (displayMetrics.widthPixels / ratioWidth == displayMetrics.heightPixels / ratioHeight)) {
-                                    theme.setWallpaper(themeInfoXml.getText());
-                                }
-                                break;
-                            case Constants.THEME_DATA_XML_BACKGROUND_LOCKSCREEN:
-                                if ((ratioHeight == -1 || ratioWidth == -1 && !theme.hasLockScreen()) ||
-                                        (displayMetrics.widthPixels / ratioWidth == displayMetrics.heightPixels / ratioHeight)) {
-                                    theme.setLockScreen(themeInfoXml.getText());
-                                }
-                                break;
-
-                            // overlay
-                            case Constants.THEME_DATA_XML_OVERLAY_TARGET:
-                                OverlayTarget ovt = getOverlayTarget(themeInfoXml.getText());
-                                if (ovt != null) {
-                                    ovt.setSwitchable(overlaySwitchable);
-                                    overlayTargetList.add(ovt);
-                                }
-                                break;
-                        }
-                        break;
-                    case XmlResourceParser.END_TAG:
-                        xmlTags.pop();
+                if (eventType == XmlResourceParser.START_TAG) {
+                    switch (themeInfoXml.getName().toLowerCase()) {
+                        case Constants.THEME_DATA_XML_OVERLAY:
+                            overlayParser(themeInfoXml, overlayTargetList);
+                            break;
+                        case Constants.THEME_DATA_XML_SOUNDS:
+                            soundsParser(themeInfoXml, theme);
+                            break;
+                        case Constants.THEME_DATA_XML_BACKGROUNDS:
+                            backgroundParser(themeInfoXml, theme);
+                            break;
+                    }
                 }
                 eventType = themeInfoXml.next();
             }
@@ -285,6 +228,121 @@ public class ThemeDataService extends Service {
         } catch (Exception e) {
             Log.e(TAG, "Failed to get theme info: " + packageName);
             return null;
+        }
+    }
+
+    private void overlayParser(XmlResourceParser xml, List<OverlayTarget> list) throws XmlPullParserException, IOException {
+        int eventType = xml.next();
+        int tagNum = 0;
+        String tagName = null;
+        boolean overlaySwitchable = true;
+        while (eventType != XmlResourceParser.END_TAG || tagNum > 0) {
+            switch (eventType) {
+                case XmlResourceParser.START_TAG:
+                    tagNum++;
+                    tagName = xml.getName().toLowerCase();
+                    overlaySwitchable = true;
+                    if (Constants.THEME_DATA_XML_OVERLAY_TARGET.equals(tagName)) {
+                        for (int i = 0; i < xml.getAttributeCount(); i++) {
+                            if (xml.getAttributeName(i).equals(Constants.THEME_DATA_XML_OVERLAY_TARGET_ATTR_SWITCHABLE)) {
+                                overlaySwitchable = xml.getAttributeBooleanValue(i, true);
+                                break;
+                            }
+                        }
+                    }
+                    break;
+                case XmlResourceParser.TEXT:
+                    if (Constants.THEME_DATA_XML_OVERLAY_TARGET.equals(tagName)) {
+                        OverlayTarget overlayTarget = getOverlayTarget(xml.getText());
+                        if (overlayTarget == null) continue;
+                        overlayTarget.setSwitchable(overlaySwitchable);
+                        list.add(overlayTarget);
+                    }
+                    break;
+                case XmlResourceParser.END_TAG:
+                    tagNum--;
+                    break;
+            }
+            eventType = xml.next();
+        }
+    }
+
+    private void soundsParser(XmlResourceParser xml, ThemeItem theme) throws XmlPullParserException, IOException {
+        int eventType = xml.next();
+        String tagName = null;
+        int tagNum = 0;
+        while (eventType != XmlResourceParser.END_TAG || tagNum > 0) {
+            switch (eventType) {
+                case XmlResourceParser.START_TAG:
+                    tagName = xml.getName().toLowerCase();
+                    tagNum++;
+                    break;
+                case XmlResourceParser.TEXT:
+                    if (tagName == null) break;
+                    switch (tagName) {
+                        case Constants.THEME_DATA_XML_SOUND_RINGTONE:
+                            theme.setRingtone(xml.getText());
+                            break;
+                        case Constants.THEME_DATA_XML_SOUND_ALARM:
+                            theme.setAlarmSound(xml.getText());
+                            break;
+                        case Constants.THEME_DATA_XML_SOUND_NOTIFICATION:
+                            theme.setNotificationSound(xml.getText());
+                            break;
+                    }
+                    break;
+                case XmlResourceParser.END_TAG:
+                    tagNum--;
+                    break;
+            }
+            eventType = xml.next();
+        }
+    }
+
+    private void backgroundParser(XmlResourceParser xml, ThemeItem theme) throws XmlPullParserException, IOException {
+        int eventType = xml.next();
+        String tagName = null;
+        int tagNum = 0;
+        DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
+        double ratioWidth = -1, ratioHeight = -1;
+        while (eventType != XmlResourceParser.END_TAG || tagNum > 0) {
+            switch (eventType) {
+                case XmlResourceParser.START_TAG:
+                    tagName = xml.getName().toLowerCase();
+                    tagNum++;
+                    if (tagName.equals(Constants.THEME_DATA_XML_BACKGROUND_WALLPAPER) || tagName.equals(Constants.THEME_DATA_XML_BACKGROUND_LOCKSCREEN)) {
+                        ratioWidth = ratioHeight = -1;
+                        for (int i = 0; i < xml.getAttributeCount(); i++) {
+                            if (xml.getAttributeName(i).equals(Constants.THEME_DATA_XML_BACKGROUND_RATIO_WIDTH)) {
+                                ratioWidth = xml.getAttributeFloatValue(i, -1);
+                            } else if (xml.getAttributeName(i).equals(Constants.THEME_DATA_XML_BACKGROUND_RATIO_HEIGHT)) {
+                                ratioHeight = xml.getAttributeFloatValue(i, -1);
+                            }
+                        }
+                    }
+                    break;
+                case XmlResourceParser.TEXT:
+                    if (tagName != null)
+                    switch (tagName) {
+                        case Constants.THEME_DATA_XML_BACKGROUND_LOCKSCREEN:
+                            if (((ratioHeight == -1 || ratioWidth == -1) && !theme.hasLockScreen()) ||
+                                (displayMetrics.widthPixels / ratioWidth == displayMetrics.heightPixels / ratioHeight)) {
+                                theme.setLockScreen(xml.getText());
+                            }
+                            break;
+                        case Constants.THEME_DATA_XML_BACKGROUND_WALLPAPER:
+                            if (((ratioHeight == -1 || ratioWidth == -1) && !theme.hasWallpaper()) ||
+                                    (displayMetrics.widthPixels / ratioWidth == displayMetrics.heightPixels / ratioHeight)) {
+                                theme.setWallpaper(xml.getText());
+                            }
+                            break;
+                    }
+                    break;
+                case XmlResourceParser.END_TAG:
+                    tagNum--;
+                    break;
+            }
+            eventType = xml.next();
         }
     }
 

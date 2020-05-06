@@ -54,9 +54,11 @@ public class Constants {
     public final static String THEME_DATA_XML_OVERLAY = "overlay";
     public final static String THEME_DATA_XML_OVERLAY_TARGET = "target";
     public final static String THEME_DATA_XML_OVERLAY_TARGET_ATTR_SWITCHABLE = "switchable";
+    public final static String THEME_DATA_XML_SOUNDS = "sounds";
     public final static String THEME_DATA_XML_SOUND_RINGTONE = "ringtone";
     public final static String THEME_DATA_XML_SOUND_ALARM = "alarm";
     public final static String THEME_DATA_XML_SOUND_NOTIFICATION = "notification";
+    public final static String THEME_DATA_XML_BACKGROUNDS = "backgrounds";
     public final static String THEME_DATA_XML_BACKGROUND_RATIO_WIDTH = "ratio_width";
     public final static String THEME_DATA_XML_BACKGROUND_RATIO_HEIGHT = "ratio_height";
     public final static String THEME_DATA_XML_BACKGROUND_WALLPAPER = "wallpaper";
