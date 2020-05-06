@@ -125,6 +125,7 @@ public class ThemePreviewActivity extends FragmentActivity implements ThemePrevi
         if (mApplyingDialog == null) mApplyingDialog = new ThemeApplyingDialog();
         mApplyingDialog.show(getSupportFragmentManager(), TAG);
         bundle.putBoolean(Constants.PREFERENCES_OVERLAY_REMOVE_FLAG, mPreferences.getBoolean(Constants.PREFERENCES_OVERLAY_REMOVE_FLAG, false));
+        bundle.putBoolean(Constants.PREFERENCES_FORCED_CENTER_WALLPAPER, mPreferences.getBoolean(Constants.PREFERENCES_FORCED_CENTER_WALLPAPER, false));
         new Thread(() -> {
             if (mThemeItem != null) {
                 mThemeManageBinder.applyTheme(mThemeItem, bundle);

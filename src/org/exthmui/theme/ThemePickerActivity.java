@@ -184,8 +184,10 @@ public class ThemePickerActivity extends FragmentActivity implements ThemePicker
     private void showPreferencesDialog() {
         View view = LayoutInflater.from(this).inflate(R.layout.preferences_dialog, null);
         Switch overlayUninstallFlag = view.findViewById(R.id.preferences_overlay_uninstall_flag);
+        Switch forcedCenterWallpaper = view.findViewById(R.id.preferences_forced_center_wallpaper);
 
         overlayUninstallFlag.setChecked(mPreferences.getBoolean(Constants.PREFERENCES_OVERLAY_REMOVE_FLAG, false));
+        forcedCenterWallpaper.setChecked(mPreferences.getBoolean(Constants.PREFERENCES_FORCED_CENTER_WALLPAPER, false));
 
         new AlertDialog.Builder(this)
                 .setTitle(R.string.menu_preferences)
@@ -194,6 +196,8 @@ public class ThemePickerActivity extends FragmentActivity implements ThemePicker
                     mPreferences.edit()
                             .putBoolean(Constants.PREFERENCES_OVERLAY_REMOVE_FLAG,
                                     overlayUninstallFlag.isChecked())
+                            .putBoolean(Constants.PREFERENCES_FORCED_CENTER_WALLPAPER,
+                                    forcedCenterWallpaper.isChecked())
                             .apply();
                     new Thread(() -> {
                         updateThemeList();

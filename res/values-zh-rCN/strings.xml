@@ -56,4 +56,5 @@
     <string name="others_fonts">字体</string>
     <string name="skin_apply_status_bootanimation">正在应用开机动画</string>
     <string name="skin_apply_status_fonts">正在应用字体</string>
+    <string name="preferences_forced_center_wallpaper">强制居中壁纸</string>
 </resources>

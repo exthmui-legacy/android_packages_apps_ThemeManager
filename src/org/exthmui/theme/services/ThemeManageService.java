@@ -25,6 +25,8 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.res.AssetManager;
 import android.content.res.Resources;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Binder;
 import android.os.Bundle;
 import android.os.IBinder;
@@ -106,6 +108,7 @@ public class ThemeManageService extends Service {
     private boolean IApplyTheme(ThemeItem theme, Bundle bundle) {
         final int userId = UserHandle.myUserId();
         final boolean uninstallFlag = bundle.getBoolean(Constants.PREFERENCES_OVERLAY_REMOVE_FLAG);
+        final boolean wallpaperCenterFlag = bundle.getBoolean(Constants.PREFERENCES_FORCED_CENTER_WALLPAPER);
         boolean needCleanFonts = true;
         boolean needCleanBootanim = true;
 
@@ -182,7 +185,7 @@ public class ThemeManageService extends Service {
             setThemeApplyStatus(Constants.THEME_APPLYING_WALLPAPER, theme);
             try {
                 InputStream is = themeAssetManager.open(Constants.THEME_DATA_ASSETS_BACKGROUNDS + "/" + theme.getWallpaper());
-                WallpaperUtil.setWallpaper(this, is);
+                WallpaperUtil.setWallpaper(this, BitmapFactory.decodeStream(is), wallpaperCenterFlag);
             } catch (IOException e) {
                 e.printStackTrace();
                 return false;
@@ -193,7 +196,7 @@ public class ThemeManageService extends Service {
             setThemeApplyStatus(Constants.THEME_APPLYING_LOCKSCREEN, theme);
             try {
                 InputStream is = themeAssetManager.open(Constants.THEME_DATA_ASSETS_BACKGROUNDS + "/" + theme.getLockScreen());
-                WallpaperUtil.setLockScreen(this, is);
+                WallpaperUtil.setLockScreen(this, BitmapFactory.decodeStream(is), true);
             } catch (IOException e) {
                 e.printStackTrace();
                 return false;

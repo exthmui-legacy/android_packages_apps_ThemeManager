@@ -18,6 +18,9 @@ package org.exthmui.theme.utils;
 
 import android.app.WallpaperManager;
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.Rect;
+import android.util.DisplayMetrics;
 import android.util.Log;
 
 import java.io.InputStream;
@@ -26,25 +29,38 @@ public class WallpaperUtil {
 
     private static final String TAG = "WallpaperUtil";
 
-    public static void setWallpaper(Context context, InputStream inputStream) {
+    public static void setBackground(Context context, Bitmap bitmap, int flag, boolean center) {
 
         WallpaperManager wallpaperManager = WallpaperManager.getInstance(context);
 
+        DisplayMetrics dm = context.getResources().getDisplayMetrics();
+        Rect visibleCropHint = new Rect();
+        if (center)
+        {
+            double ratio = (double) dm.heightPixels / dm.widthPixels;
+            double imageRatio = (double) bitmap.getHeight() / bitmap.getWidth();
+            if (ratio < imageRatio) {
+                int offset = (int) (bitmap.getHeight() - bitmap.getWidth() * ratio) / 2;
+                visibleCropHint.set(0, offset, bitmap.getWidth(), bitmap.getHeight() - offset);
+            } else {
+                int offset = (int) (bitmap.getWidth() - bitmap.getHeight() / ratio) / 2;
+                visibleCropHint.set(offset, 0, bitmap.getWidth() - offset, bitmap.getHeight());
+            }
+        }
+
         try {
-            wallpaperManager.setStream(inputStream,null,true, WallpaperManager.FLAG_SYSTEM);
+            wallpaperManager.setBitmap(bitmap, center ? visibleCropHint : null,true, flag);
         } catch (Exception e) {
-            Log.e(TAG, "Failed to set wallpaper", e);
+            Log.e(TAG, "Failed to set background, flag=" + flag, e);
         }
     }
 
-    public static void setLockScreen(Context context, InputStream inputStream) {
 
-        WallpaperManager wallpaperManager = WallpaperManager.getInstance(context);
+    public static void setWallpaper(Context context, Bitmap bitmap, boolean center) {
+        setBackground(context, bitmap, WallpaperManager.FLAG_SYSTEM, center);
+    }
 
-        try {
-            wallpaperManager.setStream(inputStream,null,true, WallpaperManager.FLAG_LOCK);
-        } catch (Exception e) {
-            Log.e(TAG, "Failed to set lockscreen wallpaper", e);
-        }
+    public static void setLockScreen(Context context, Bitmap bitmap, boolean center) {
+        setBackground(context, bitmap, WallpaperManager.FLAG_LOCK, center);
     }
 }

@@ -90,6 +90,6 @@ public class Constants {
 
     // Preferences key
     public final static String PREFERENCES_OVERLAY_REMOVE_FLAG = "overlay_uninstall_flag";
-    public final static String PREFERENCES_LIST_ACCENT_PACKAGES = "list_accents";
+    public final static String PREFERENCES_FORCED_CENTER_WALLPAPER = "forced_center_wallpaper";
 
 }

@@ -54,6 +54,7 @@
     <string name="menu_preferences">Preferences</string>
 
     <string name="preferences_overlay_uninstall_flag">Uninstall the overlay after disabling it</string>
+    <string name="preferences_forced_center_wallpaper">Forced center wallpapers</string>
     <string name="separator_others">Others</string>
     <string name="others_bootanimation">Boot animation</string>
     <string name="others_fonts">Fonts</string>
