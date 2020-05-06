@@ -121,6 +121,7 @@ public class ThemePreviewActivity extends FragmentActivity implements ThemePrevi
 
     @Override
     public void applyTheme(Bundle bundle) {
+        if (mApplyingDialog == null) mApplyingDialog = new ThemeApplyingDialog();
         mApplyingDialog.show(getSupportFragmentManager(), TAG);
         bundle.putBoolean(Constants.PREFERENCES_OVERLAY_REMOVE_FLAG, mPreferences.getBoolean(Constants.PREFERENCES_OVERLAY_REMOVE_FLAG, false));
         new Thread(() -> {
