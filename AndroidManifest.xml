@@ -20,18 +20,14 @@
     package="org.exthmui.theme"
     android:sharedUserId="android.uid.system">
 
-    <permission
-        android:protectionLevel="normal"
-        android:name="exthmui.permission.READ_THEME_DATA" />
-    <permission
-        android:protectionLevel="signature"
-        android:name="exthmui.permission.MANAGE_THEME" />
-
+    <uses-permission android:name="android.permission.INTERACT_ACROSS_USERS" />
     <uses-permission android:name="android.permission.SET_WALLPAPER" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_SETTINGS" />
     <uses-permission android:name="android.permission.DELETE_PACKAGES" />
     <uses-permission android:name="android.permission.INSTALL_PACKAGES" />
+
+    <protected-broadcast android:name="org.exthmui.theme.THEME_APPLY_RESULT" />
 
     <application
         android:allowBackup="false"

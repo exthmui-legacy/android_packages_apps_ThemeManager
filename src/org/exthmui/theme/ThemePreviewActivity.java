@@ -24,6 +24,7 @@ import android.content.SharedPreferences;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.os.UserHandle;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
@@ -78,8 +79,8 @@ public class ThemePreviewActivity extends FragmentActivity implements ThemePrevi
         mThemeDataConn = new ThemeDataConn();
         Intent mThemeManageService = new Intent(this, ThemeManageService.class);
         mThemeManageConn = new ThemeManageConn();
-        bindService(mThemeDataService, mThemeDataConn, Context.BIND_AUTO_CREATE);
-        bindService(mThemeManageService, mThemeManageConn, Context.BIND_AUTO_CREATE);
+        bindServiceAsUser(mThemeDataService, mThemeDataConn, Context.BIND_AUTO_CREATE, UserHandle.CURRENT_OR_SELF);
+        bindServiceAsUser(mThemeManageService, mThemeManageConn, Context.BIND_AUTO_CREATE, UserHandle.CURRENT_OR_SELF);
     }
 
     @Override
@@ -152,7 +153,7 @@ public class ThemePreviewActivity extends FragmentActivity implements ThemePrevi
             mThemeManageBinder = (ThemeManageService.ThemeManageBinder) iBinder;
             mThemeApplyStatusListener = data -> {
                 if (mFragment == null || mApplyingDialog == null) return false;
-                sendBroadcast(data);
+                sendBroadcastAsUser(data, UserHandle.CURRENT_OR_SELF);
                 runOnUiThread(() -> mApplyingDialog.updateData(data));
                 return true;
             };

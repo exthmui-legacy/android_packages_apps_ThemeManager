@@ -25,6 +25,7 @@ import android.content.SharedPreferences;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.os.UserHandle;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -88,9 +89,9 @@ public class ThemePickerActivity extends FragmentActivity implements ThemePicker
         Intent mThemeDataService = new Intent(this, ThemeDataService.class);
         mThemeDataConn = new ThemeDataConn();
         Intent mThemeManageService = new Intent(this, ThemeManageService.class);
-        startService(mThemeManageService);
-        startService(mThemeDataService);
-        bindService(mThemeDataService, mThemeDataConn, Context.BIND_AUTO_CREATE);
+        startServiceAsUser(mThemeManageService, UserHandle.CURRENT_OR_SELF);
+        startServiceAsUser(mThemeDataService, UserHandle.CURRENT_OR_SELF);
+        bindServiceAsUser(mThemeDataService, mThemeDataConn, Context.BIND_AUTO_CREATE, UserHandle.CURRENT_OR_SELF);
     }
 
     @Override
