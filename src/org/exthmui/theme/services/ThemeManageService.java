@@ -108,6 +108,8 @@ public class ThemeManageService extends Service {
     private boolean IApplyTheme(ThemeItem theme, Bundle bundle) {
         final int userId = UserHandle.myUserId();
         final boolean uninstallFlag = bundle.getBoolean(Constants.PREFERENCES_OVERLAY_REMOVE_FLAG);
+        boolean needCleanFonts = true;
+        boolean needCleanBootanim = true;
 
         List<OverlayTarget> overlayTargetPackages = theme.getOverlayTargets();
         Map<String, String> themeOverlays = new HashMap<>();
@@ -237,6 +239,7 @@ public class ThemeManageService extends Service {
         // bootanimation
         if (theme.hasBootanimation && bundle.getBoolean(Constants.THEME_TARGET_BOOTANIMATION)) {
             setThemeApplyStatus(Constants.THEME_APPLYING_BOOTANIMATION, theme);
+            needCleanBootanim = false;
             try {
                 File bootanimFile = new File(Constants.THEME_DATA_BOOTANIMATION_PATH + "/bootanimation.zip");
                 File darkBootanimFile = new File(Constants.THEME_DATA_BOOTANIMATION_PATH + "/bootanimation-dark.zip");
@@ -259,6 +262,7 @@ public class ThemeManageService extends Service {
         // fonts
         if (theme.hasFonts && bundle.getBoolean(Constants.THEME_TARGET_FONTS)) {
             setThemeApplyStatus(Constants.THEME_APPLYING_FONTS, theme);
+            needCleanFonts = false;
             File fontDir = new File(Constants.THEME_DATA_FONTS_PATH);
             File[] existFontFiles = fontDir.listFiles();
             if (existFontFiles != null) {
@@ -312,8 +316,31 @@ public class ThemeManageService extends Service {
             }
         }
 
-        // disable and uninstall old overlays
         setThemeApplyStatus(Constants.THEME_CLEANING, theme);
+        // delete fonts and bootanimation
+        if (needCleanBootanim) {
+            File bootanimFile = new File(Constants.THEME_DATA_BOOTANIMATION_PATH + "/bootanimation.zip");
+            File darkBootanimFile = new File(Constants.THEME_DATA_BOOTANIMATION_PATH + "/bootanimation-dark.zip");
+            bootanimFile.delete(); darkBootanimFile.delete();
+        }
+        if (needCleanFonts) {
+            File fontDir = new File(Constants.THEME_DATA_FONTS_PATH);
+            File[] existFontFiles = fontDir.listFiles();
+            if (existFontFiles != null) {
+                for (File fontFile : existFontFiles) fontFile.delete();
+            }
+            // use fake-fonts overlay to refresh font cache
+            try {
+                SystemProperties.set(Constants.PROP_REFRESH_FONTS, "true");
+                mOverlayService.setEnabled(Constants.FAKE_FONTS_OVERLAY, true, userId);
+                Thread.sleep(1000);
+                mOverlayService.setEnabled(Constants.FAKE_FONTS_OVERLAY, false, userId);
+            } catch (RemoteException | InterruptedException e) {
+                e.printStackTrace();
+                return false;
+            }
+        }
+        // disable and uninstall old overlays
         List<PackageInfo> allPackages = mPackageManager.getInstalledPackages(0);
         for (PackageInfo pkgInfo : allPackages) {
             if (isThemeOverlayPackage(pkgInfo.packageName) && !themeOverlays.containsValue(pkgInfo.packageName)) {
