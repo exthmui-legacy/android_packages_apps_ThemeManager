@@ -47,13 +47,11 @@
         <service
             android:name=".services.ThemeManageService"
             android:enabled="true"
-            android:permission="exthmui.permission.MANAGE_THEME"
-            android:exported="true"/>
+            android:exported="false"/>
         <service
             android:name=".services.ThemeDataService"
             android:enabled="true"
-            android:permission="exthmui.permission.READ_THEME_DATA"
-            android:exported="true"/>
+            android:exported="false"/>
 
         <activity android:name=".ThemePreviewActivity"
             android:launchMode="singleTask"
