@@ -314,9 +314,9 @@ public class ThemeDataService extends Service {
                         ratioWidth = ratioHeight = -1;
                         for (int i = 0; i < xml.getAttributeCount(); i++) {
                             if (xml.getAttributeName(i).equals(Constants.THEME_DATA_XML_BACKGROUND_RATIO_WIDTH)) {
-                                ratioWidth = xml.getAttributeFloatValue(i, -1);
+                                ratioWidth = Float.parseFloat(xml.getAttributeValue(i));
                             } else if (xml.getAttributeName(i).equals(Constants.THEME_DATA_XML_BACKGROUND_RATIO_HEIGHT)) {
-                                ratioHeight = xml.getAttributeFloatValue(i, -1);
+                                ratioHeight = Float.parseFloat(xml.getAttributeValue(i));
                             }
                         }
                     }
