@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        style="@style/theme_card"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <ImageView
+            android:id="@+id/theme_card_image"
+            style="@style/theme_card_image"
+            android:layout_width="fill_parent"
+            android:layout_height="@dimen/theme_card_image_height"
+            android:contentDescription="@null" />
+
+        <TextView
+            android:id="@+id/theme_card_title"
+            style="@style/theme_card_title"
+            android:layout_gravity="bottom"
+            android:ellipsize="end"
+            android:lines="@integer/item_theme_title_max_lines"
+            android:maxLines="@integer/item_theme_title_max_lines" />
+
+    </LinearLayout>
+
+</androidx.cardview.widget.CardView>

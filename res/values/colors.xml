@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="theme_preview_overlay">#77000000</color>
-    <color name="menu_icon">#212121</color>
+    <color name="menu_icon">#FFFFFF</color>
+    <color name="colorPrimary">#232323</color>
+    <color name="colorPrimaryDark">#232323</color>
+    <color name="colorAccent">#FF4081</color>
 </resources>

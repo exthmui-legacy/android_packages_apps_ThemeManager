@@ -4,4 +4,22 @@
     android:id="@+id/container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ThemePickerActivity" />
+    tools:context=".ThemePickerActivity" >
+
+    <GridView
+        android:id="@+id/themesGrid"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:cacheColorHint="@android:color/transparent"
+        android:clipToPadding="false"
+        android:drawSelectorOnTop="false"
+        android:horizontalSpacing="@dimen/picker_grid_horizontal_spacing"
+        android:paddingStart="@dimen/picker_grid_padding_start"
+        android:paddingTop="@dimen/picker_grid_padding_top"
+        android:paddingEnd="@dimen/picker_grid_padding_end"
+        android:paddingBottom="@dimen/picker_grid_padding_bottom"
+        android:scrollbarAlwaysDrawVerticalTrack="true"
+        android:scrollbarStyle="outsideOverlay"
+        android:stretchMode="columnWidth"
+        android:verticalSpacing="@dimen/picker_grid_vertical_spacing" />
+</FrameLayout>

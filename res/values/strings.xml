@@ -19,12 +19,11 @@
 <resources>
     <string name="app_name">Theme</string>
 
-    <string name="skin_picker_button_apply">Apply Theme</string>
-
     <string name="separator_sound">Sound</string>
     <string name="separator_background">Background</string>
     <string name="separator_app">Application</string>
     <string name="separator_preview">Preview</string>
+    <string name="separator_others">Others</string>
 
     <string name="background_wallpaper">Wallpaper</string>
     <string name="background_lockscreen">Lockscreen wallpaper</string>
@@ -33,7 +32,11 @@
     <string name="sound_alarm">Alarm</string>
     <string name="sound_notification">Notification</string>
 
+    <string name="others_bootanimation">Boot animation</string>
+    <string name="others_fonts">Fonts</string>
+
     <string name="channel_apply_status">Theme apply ststus</string>
+
     <string name="skin_apply_status_running">Applying theme</string>
     <string name="skin_apply_status_ringtone">Applying ringtone</string>
     <string name="skin_apply_status_alarm">Applying alarm ringtone</string>
@@ -41,6 +44,7 @@
     <string name="skin_apply_status_wallpaper">Applying wallpaper</string>
     <string name="skin_apply_status_lockscreen">Applying lockscreen wallpaper</string>
     <string name="skin_apply_status_bootanimation">Applying boot animation</string>
+    <string name="skin_apply_status_fonts">Applying fonts</string>
     <string name="skin_apply_status_installing_overlay">Installing overlay</string>
     <string name="skin_apply_status_overlay">Applying theme to %1$s</string>
     <string name="skin_apply_status_cleaning">Cleaning</string>
@@ -50,13 +54,13 @@
     <string name="dialog_remove_package_title">Uninstall theme</string>
     <string name="dialog_remove_package_text">Are you sure you want to uninstall %1$s ?</string>
 
-    <string name="menu_refresh">Refresh</string>
-    <string name="menu_preferences">Preferences</string>
+    <string name="preview_menu_apply">Apply</string>
+    <string name="picker_menu_refresh">Refresh</string>
+    <string name="picker_menu_preferences">Preferences</string>
 
+    <string name="preferences_title">Preferences</string>
+    <string name="preferences_applying_header">Applying</string>
     <string name="preferences_overlay_uninstall_flag">Uninstall the overlay after disabling it</string>
     <string name="preferences_forced_center_wallpaper">Forced center wallpapers</string>
-    <string name="separator_others">Others</string>
-    <string name="others_bootanimation">Boot animation</string>
-    <string name="others_fonts">Fonts</string>
-    <string name="skin_apply_status_fonts">Applying fonts</string>
+
 </resources>
