@@ -50,6 +50,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
@@ -62,7 +63,7 @@ public class ThemeManageService extends Service {
 
     private IOverlayManager mOverlayService;
     private PackageManager mPackageManager;
-    private Map<ThemeApplyStatusListener, Boolean> mApplyStatusListenerMap;
+    private List<ThemeApplyStatusListener> mApplyStatusListenerList;
     private Queue<Intent> mApplyStatusQueue;
 
     @Override
@@ -70,7 +71,7 @@ public class ThemeManageService extends Service {
         mOverlayService = IOverlayManager.Stub.asInterface(ServiceManager.getService("overlay"));
         mPackageManager = getPackageManager();
         mApplyStatusQueue = new LinkedBlockingQueue<>();
-        mApplyStatusListenerMap = new HashMap<>();
+        mApplyStatusListenerList = new LinkedList<>();
     }
 
     @Override
@@ -91,12 +92,12 @@ public class ThemeManageService extends Service {
         }
 
         public void addThemeApplyStatusListener(ThemeApplyStatusListener listener) {
-            mApplyStatusListenerMap.put(listener, true);
+            mApplyStatusListenerList.add(listener);
             notifyThemeApplyStatus();
         }
 
         public void removeThemeApplyStatusListener(ThemeApplyStatusListener listener) {
-            mApplyStatusListenerMap.put(listener, false);
+            mApplyStatusListenerList.remove(listener);
         }
     }
 
@@ -391,17 +392,11 @@ public class ThemeManageService extends Service {
     }
 
     private void notifyThemeApplyStatus() {
-        while (!mApplyStatusQueue.isEmpty() && !mApplyStatusListenerMap.isEmpty()) {
+        while (!mApplyStatusQueue.isEmpty() && !mApplyStatusListenerList.isEmpty()) {
             boolean popFlag = false;
             Intent data = mApplyStatusQueue.peek();
-            Iterator<Map.Entry<ThemeApplyStatusListener, Boolean>> iterator = mApplyStatusListenerMap.entrySet().iterator();
-            while (iterator.hasNext()) {
-                Map.Entry<ThemeApplyStatusListener, Boolean> entry = iterator.next();
-                if (!entry.getValue()) {
-                    iterator.remove();
-                    continue;
-                }
-                if (entry.getKey().update(data)) popFlag = true;
+            for (ThemeApplyStatusListener listener : mApplyStatusListenerList) {
+                if (listener.update(data)) popFlag = true;
             }
             if (popFlag) mApplyStatusQueue.poll();
         }
