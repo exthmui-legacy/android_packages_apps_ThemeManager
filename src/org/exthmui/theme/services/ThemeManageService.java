@@ -145,24 +145,15 @@ public class ThemeManageService extends Service {
             synchronized (installResult) {
                 PackageUtil.installPackage(this, is, new PackageUtil.PackageInstallerCallback() {
                     @Override
-                    public void onSuccess(String packageName) {
+                    public void onResponse(String packageName, int code) {
                         // check installed package for security reasons
                         if (!isThemeOverlayPackage(packageName)) {
                             Log.w(TAG, "Package " + packageName + " is not a verified overlay package!");
-                            onFailure(packageName, 0);
-                            return;
+                        } else {
+                            themeOverlays.put(ovt.getPackageName(), packageName);
                         }
-                        themeOverlays.put(ovt.getPackageName(), packageName);
                         synchronized (installResult) {
-                            installResult.set(true);
-                            installResult.notify();
-                        }
-                    }
-
-                    @Override
-                    public void onFailure(String packageName, int code) {
-                        synchronized (installResult) {
-                            installResult.set(false);
+                            installResult.set(code == 0);
                             installResult.notify();
                         }
                     }

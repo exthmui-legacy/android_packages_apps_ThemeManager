@@ -44,14 +44,8 @@ public class PackageUtil {
 
                 String packageName = intent.getStringExtra(PackageInstaller.EXTRA_PACKAGE_NAME);
 
-                boolean successFlag = PackageInstaller.STATUS_SUCCESS == statusCode;
-
                 if (callback == null) return;
-                if (successFlag) {
-                    callback.onSuccess(packageName);
-                } else {
-                    callback.onFailure(packageName, statusCode);
-                }
+                callback.onResponse(packageName, statusCode);
             }
         }, new IntentFilter(installId));
 
@@ -89,15 +83,8 @@ public class PackageUtil {
             public void onReceive(Context context, Intent intent) {
                 context.unregisterReceiver(this);
                 int statusCode = intent.getIntExtra(PackageInstaller.EXTRA_STATUS, PackageInstaller.STATUS_FAILURE);
-
-                boolean successFlag = PackageInstaller.STATUS_SUCCESS == statusCode;
-
                 if (callback == null) return;
-                if (successFlag) {
-                    callback.onSuccess(packageName);
-                } else {
-                    callback.onFailure(packageName, statusCode);
-                }
+                callback.onResponse(packageName, statusCode);
             }
         }, new IntentFilter(uninstallId));
 
@@ -110,8 +97,7 @@ public class PackageUtil {
     }
 
     public interface PackageInstallerCallback {
-        void onSuccess(String packageName);
-        void onFailure(String packageName, int code);
+        void onResponse(String packageName, int code);
     }
 
 }

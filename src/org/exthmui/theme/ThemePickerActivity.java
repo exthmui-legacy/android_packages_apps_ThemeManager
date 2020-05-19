@@ -218,14 +218,14 @@ public class ThemePickerActivity extends FragmentActivity implements ThemePicker
                     // do uninstall
                     PackageUtil.uninstallPackage(this, theme.getPackageName(), new PackageUtil.PackageInstallerCallback() {
                         @Override
-                        public void onSuccess(String packageName) {
-                            mThemeList.remove(index);
-                            mFragment.updateAdapter();
-                        }
-
-                        @Override
-                        public void onFailure(String packageName, int code) {
-
+                        public void onResponse(String packageName, int code) {
+                            if (code == 0) {
+                                mThemeList.remove(position);
+                                mThemeBaseAdapter.notifyDataSetChanged();
+                                Snackbar.make(mGridView, R.string.uninstall_theme_succeed, Snackbar.LENGTH_SHORT).show();
+                            } else {
+                                Snackbar.make(mGridView, getString(R.string.uninstall_theme_failed, code), Snackbar.LENGTH_LONG).show();
+                            }
                         }
                     });
 
