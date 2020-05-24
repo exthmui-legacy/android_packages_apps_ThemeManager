@@ -16,7 +16,10 @@
 
 package org.exthmui.theme.models;
 
-public class ThemeBase {
+import android.os.Parcel;
+import android.os.Parcelable;
+
+public class ThemeBase implements Parcelable {
 
     private String mTitle;
     private final String mPackageName;
@@ -26,6 +29,25 @@ public class ThemeBase {
     public ThemeBase(String packageName) {
         mPackageName = packageName;
     }
+
+    public ThemeBase(Parcel in) {
+        mTitle = in.readString();
+        mPackageName = in.readString();
+        mAuthor = in.readString();
+        mRemovable = in.readBoolean();
+    }
+
+    public static final Creator<ThemeBase> CREATOR = new Creator<ThemeBase>() {
+        @Override
+        public ThemeBase createFromParcel(Parcel in) {
+            return new ThemeBase(in);
+        }
+
+        @Override
+        public ThemeBase[] newArray(int size) {
+            return new ThemeBase[size];
+        }
+    };
 
     public void setTitle(String title) {
         mTitle = title;
@@ -53,5 +75,18 @@ public class ThemeBase {
 
     public boolean isRemovable() {
         return mRemovable;
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(mTitle);
+        dest.writeString(mPackageName);
+        dest.writeString(mAuthor);
+        dest.writeBoolean(mRemovable);
     }
 }

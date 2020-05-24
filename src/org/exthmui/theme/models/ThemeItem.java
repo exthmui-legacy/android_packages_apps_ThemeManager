@@ -16,6 +16,9 @@
 
 package org.exthmui.theme.models;
 
+import android.os.Parcel;
+
+import java.util.ArrayList;
 import java.util.List;
 
 public class ThemeItem extends ThemeBase {
@@ -34,6 +37,30 @@ public class ThemeItem extends ThemeBase {
     public ThemeItem(String packageName) {
         super(packageName);
     }
+
+    private ThemeItem(Parcel in) {
+        super(in);
+        mWallpaper = in.readString();
+        mLockScreen = in.readString();
+        mAlarmSound = in.readString();
+        mNotificationSound = in.readString();
+        mRingtone = in.readString();
+        hasBootanimation = in.readBoolean();
+        hasFonts = in.readBoolean();
+        mOverlayTargets = in.readParcelableList(new ArrayList<>(), OverlayTarget.class.getClassLoader());
+    }
+
+    public static final Creator<ThemeBase> CREATOR = new Creator<ThemeBase>() {
+        @Override
+        public ThemeBase createFromParcel(Parcel in) {
+            return new ThemeItem(in);
+        }
+
+        @Override
+        public ThemeBase[] newArray(int size) {
+            return new ThemeItem[size];
+        }
+    };
 
     public void setAlarmSound(String alarmSound) {
         mAlarmSound = alarmSound;
@@ -107,4 +134,16 @@ public class ThemeItem extends ThemeBase {
         return mRingtone;
     }
 
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        super.writeToParcel(dest, flags);
+        dest.writeString(mWallpaper);
+        dest.writeString(mLockScreen);
+        dest.writeString(mAlarmSound);
+        dest.writeString(mNotificationSound);
+        dest.writeString(mRingtone);
+        dest.writeBoolean(hasBootanimation);
+        dest.writeBoolean(hasFonts);
+        dest.writeParcelableList(mOverlayTargets, flags);
+    }
 }
