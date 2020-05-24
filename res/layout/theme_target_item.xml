@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/theme_target"
+    android:layout_width="match_parent"
+    android:layout_height="@dimen/theme_target_height"
+    android:gravity="center"
+    android:layout_marginTop="@dimen/theme_target_margin_top"
+    android:layout_marginBottom="@dimen/theme_target_margin_bottom"
+    android:layout_marginStart="@dimen/theme_target_margin_start"
+    android:layout_marginEnd="@dimen/theme_target_margin_end"
+    android:paddingStart="@dimen/theme_target_padding_start"
+    android:paddingEnd="@dimen/theme_target_padding_end">
+
+    <ImageView
+        android:id="@+id/theme_target_icon"
+        android:layout_width="@dimen/theme_target_icon_width"
+        android:layout_height="@dimen/theme_target_icon_height"
+        android:padding="@dimen/theme_target_icon_padding"
+        android:scaleType="fitCenter"
+        android:contentDescription="@null" />
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:gravity="center|start"
+        android:paddingStart="@dimen/theme_target_text_padding_start"
+        android:paddingEnd="@dimen/theme_target_text_padding_end">
+
+        <TextView
+            android:id="@+id/theme_target_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            style="@style/theme_target_name"/>
+
+        <TextView
+            android:id="@+id/theme_target_id"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            style="@style/theme_target_id" />
+    </LinearLayout>
+</LinearLayout>

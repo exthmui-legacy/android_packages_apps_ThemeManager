@@ -1,41 +1,63 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <dimen name="card_image_height">194.0dip</dimen>
-    <dimen name="preview_image_height">194.0dip</dimen>
+    <dimen name="fab_margin">16dp</dimen>
 
-    <dimen name="back_button_height">32.0dip</dimen>
-    <dimen name="back_button_width">32.0dip</dimen>
-    <dimen name="button_margin">8.0dip</dimen>
+    <dimen name="theme_card_title_margin_start">8.0dip</dimen>
+    <dimen name="theme_card_title_margin_end">8.0dip</dimen>
+    <dimen name="theme_card_title_margin_top">8.0dip</dimen>
+    <dimen name="theme_card_title_margin_bottom">8.0dip</dimen>
+    <dimen name="theme_card_image_height">194.0dip</dimen>
 
-    <dimen name="card_margin_bottom">8.0dip</dimen>
-    <dimen name="card_margin_large">8.0dip</dimen>
-    <dimen name="card_margin_small">4.0dip</dimen>
+    <dimen name="theme_card_margin_top">4.0dip</dimen>
+    <dimen name="theme_card_margin_bottom">4.0dip</dimen>
+    <dimen name="theme_card_margin_start">4.0dip</dimen>
+    <dimen name="theme_card_margin_end">4.0dip</dimen>
 
-    <dimen name="select_grid_horizontal_spacing">8.0dip</dimen>
-    <dimen name="select_grid_padding_bottom">16.0dip</dimen>
-    <dimen name="select_grid_padding_end">8.0dip</dimen>
-    <dimen name="select_grid_padding_start">8.0dip</dimen>
-    <dimen name="select_grid_padding_top">16.0dip</dimen>
-    <dimen name="select_grid_vertical_spacing">8.0dip</dimen>
+    <dimen name="theme_target_icon_height">46.0dip</dimen>
+    <dimen name="theme_target_icon_width">46.0dip</dimen>
+    <dimen name="theme_target_icon_padding">8.0dip</dimen>
 
-    <dimen name="picker_actionbar_icon_shadow_alpha">0.2</dimen>
+    <dimen name="theme_target_text_padding_start">12.0dip</dimen>
+    <dimen name="theme_target_text_padding_end">12.0dip</dimen>
 
-    <dimen name="picker_activity_padding_end">16.0dip</dimen>
-    <dimen name="picker_activity_padding_start">16.0dip</dimen>
-    <dimen name="picker_activity_padding_top">8.0dip</dimen>
-    <dimen name="picker_activity_padding_bottom">8.0dip</dimen>
+    <dimen name="theme_target_padding_start">7.5dip</dimen>
+    <dimen name="theme_target_padding_end">15.0dip</dimen>
+    <dimen name="theme_target_height">80.0dip</dimen>
 
-    <dimen name="preview_activity_subheader_padding_end">0dip</dimen>
-    <dimen name="preview_image_divider_size">8.0dip</dimen>
+    <dimen name="theme_target_name_size">14sp</dimen>
+    <dimen name="theme_target_id_size">10sp</dimen>
 
-    <dimen name="picker_switch_padding_left">16dip</dimen>
-    <dimen name="picker_switch_padding_right">16dip</dimen>
-    <dimen name="picker_switch_padding_top">8dip</dimen>
-    <dimen name="picker_switch_padding_bottom">8dip</dimen>
+    <dimen name="theme_target_margin_top">4.0dip</dimen>
+    <dimen name="theme_target_margin_bottom">4.0dip</dimen>
+    <dimen name="theme_target_margin_start">4.0dip</dimen>
+    <dimen name="theme_target_margin_end">4.0dip</dimen>
 
-    <dimen name="applying_layout_padding_start">24dip</dimen>
-    <dimen name="applying_layout_padding_end">24dip</dimen>
-    <dimen name="applying_layout_padding_top">24dip</dimen>
+    <dimen name="theme_subtitle_margin_start">8.0dip</dimen>
+    <dimen name="theme_subtitle_margin_end">8.0dip</dimen>
+
+    <dimen name="theme_preview_image_margin_start">4.0dip</dimen>
+    <dimen name="theme_preview_image_margin_end">4.0dip</dimen>
+
+    <dimen name="picker_grid_padding_bottom">8.0dip</dimen>
+    <dimen name="picker_grid_padding_end">8.0dip</dimen>
+    <dimen name="picker_grid_padding_start">8.0dip</dimen>
+    <dimen name="picker_grid_padding_top">8.0dip</dimen>
+
+    <dimen name="actionbar_icon_shadow_alpha">0.2</dimen>
+
+    <dimen name="preview_theme_info_padding_start">16.0dip</dimen>
+    <dimen name="preview_theme_info_padding_end">16.0dip</dimen>
+    <dimen name="preview_theme_info_padding_top">8.0dip</dimen>
+    <dimen name="preview_theme_info_padding_bottom">8.0dip</dimen>
+    <dimen name="preview_theme_info_height">72.0dip</dimen>
+
+    <dimen name="preview_grid_padding_bottom">8.0dip</dimen>
+    <dimen name="preview_grid_padding_end">8.0dip</dimen>
+    <dimen name="preview_grid_padding_start">8.0dip</dimen>
+    <dimen name="preview_grid_padding_top">8.0dip</dimen>
+
+    <dimen name="applying_layout_padding_start">12dip</dimen>
+    <dimen name="applying_layout_padding_end">12dip</dimen>
+    <dimen name="applying_layout_padding_top">12dip</dimen>
     <dimen name="applying_layout_padding_bottom">12dip</dimen>
-    <dimen name="applying_layout_margin_bottom">12dip</dimen>
 </resources>

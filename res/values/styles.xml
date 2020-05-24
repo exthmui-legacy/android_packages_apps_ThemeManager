@@ -1,61 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <style name="Theme.Picker.ApplySkinButton" parent="@android:style/Theme.DeviceDefault">
-        <item name="android:colorButtonNormal">?android:colorAccent</item>
+    <style name="AppTheme" parent="Theme.AppCompat.DayNight.DarkActionBar" />
+    <style name="AppTheme.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Dark" />
+
+    <style name="theme_card">
+        <item name="android:foreground">?android:selectableItemBackground</item>
+        <item name="android:descendantFocusability">blocksDescendants</item>
     </style>
 
-    <style name="common_subheader" parent="@android:style/TextAppearance.Material.Body2">
-        <item name="android:textColor">?android:colorAccent</item>
-        <item name="android:gravity">start|center</item>
-        <item name="android:focusable">false</item>
-        <item name="android:focusableInTouchMode">false</item>
-        <item name="android:clickable">false</item>
-        <item name="android:layout_width">fill_parent</item>
-        <item name="android:layout_height">48.0dip</item>
-        <item name="android:paddingStart">@dimen/picker_activity_padding_start</item>
-        <item name="android:paddingEnd">@dimen/picker_activity_padding_end</item>
-    </style>
-
-    <style name="skin_preview_subheader" parent="common_subheader">
-        <item name="android:paddingEnd">@dimen/preview_activity_subheader_padding_end</item>
-    </style>
-
-    <style name="item_base">
-        <item name="android:layout_width">fill_parent</item>
-        <item name="android:layout_marginBottom">@dimen/card_margin_large</item>
-        <item name="android:layout_marginStart">@dimen/card_margin_small</item>
-        <item name="android:layout_marginEnd">@dimen/card_margin_small</item>
-        <item name="android:elevation">2.0dip</item>
-    </style>
-
-    <style name="item_skin" parent="item_base">
-        <item name="android:orientation">vertical</item>
-        <item name="android:layout_height">fill_parent</item>
-    </style>
-
-    <style name="item_skin_skinImage">
-        <item name="android:background">?android:selectableItemBackground</item>
+    <style name="theme_card_image">
         <item name="android:scaleType">centerCrop</item>
         <item name="android:adjustViewBounds">true</item>
     </style>
 
-    <style name="skin_preview_layout">
-        <item name="android:divider">@drawable/shape_divider</item>
-        <item name="android:showDividers">middle|beginning|end</item>
-    </style>
-
-    <style name="item_skin_skinTitle" parent="@android:style/Widget.DeviceDefault.Light.TextView">
+    <style name="theme_card_title" parent="@android:style/Widget.DeviceDefault.TextView">
         <item name="android:textAppearance">?android:textAppearanceSmall</item>
         <item name="android:textColor">?android:textColorPrimary</item>
         <item name="android:gravity">start|center|top</item>
-        <item name="android:layout_width">fill_parent</item>
-        <item name="android:layout_height">fill_parent</item>
-        <item name="android:layout_marginTop">@dimen/card_margin_large</item>
-        <item name="android:layout_marginBottom">@dimen/card_margin_bottom</item>
         <item name="android:textAlignment">viewStart</item>
-        <item name="android:layout_marginStart">@dimen/card_margin_large</item>
-        <item name="android:layout_marginEnd">@dimen/card_margin_large</item>
+        <item name="android:layout_margin">@dimen/theme_card_title_margin_start</item>
+        <item name="android:layout_marginEnd">@dimen/theme_card_title_margin_end</item>
+        <item name="android:layout_marginTop">@dimen/theme_card_title_margin_top</item>
+        <item name="android:layout_marginBottom">@dimen/theme_card_title_margin_bottom</item>
     </style>
 
     <style name="skin_applying_dialog">
@@ -63,12 +35,52 @@
         <item name="android:paddingTop">@dimen/applying_layout_padding_top</item>
         <item name="android:paddingEnd">@dimen/applying_layout_padding_end</item>
         <item name="android:paddingBottom">@dimen/applying_layout_padding_bottom</item>
-        <item name="android:layout_width">match_parent</item>
-        <item name="android:layout_height">wrap_content</item>
         <item name="android:windowIsFloating">true</item>
     </style>
 
     <style name="skin_applying_dialog_button" parent="@android:style/Widget.DeviceDefault.Button.Borderless.Small">
         <item name="android:textColor">?android:colorAccent</item>
+    </style>
+
+    <style name="sub_header" parent="@android:style/TextAppearance.Material.Body2">
+        <item name="android:textColor">?android:colorAccent</item>
+        <item name="android:gravity">center</item>
+        <item name="android:focusable">false</item>
+        <item name="android:focusableInTouchMode">false</item>
+        <item name="android:clickable">false</item>
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">36.0dip</item>
+    </style>
+
+    <style name="theme_target">
+        <item name="cardBackground">#f2f2f2</item>
+        <item name="nameTextColor">#000000</item>
+        <item name="idTextColor">#696969</item>
+        <item name="iconColor">#565656</item>
+    </style>
+    <style name="theme_target_disabled">
+        <item name="cardBackground">#DDDDDD</item>
+        <item name="nameTextColor">#000000</item>
+        <item name="idTextColor">#696969</item>
+        <item name="iconColor">#565656</item>
+    </style>
+    <style name="theme_target_selected">
+        <item name="cardBackground">#2979ff</item>
+        <item name="nameTextColor">#ffffff</item>
+        <item name="idTextColor">#E0E0E0</item>
+        <item name="iconColor">#ffffff</item>
+    </style>
+
+    <style name="theme_target_name">
+        <item name="android:maxLines">1</item>
+        <item name="android:ellipsize">end</item>
+        <item name="android:textAppearance">?android:textAppearanceMedium</item>
+        <item name="android:textSize">@dimen/theme_target_name_size</item>
+    </style>
+    <style name="theme_target_id">
+        <item name="android:maxLines">1</item>
+        <item name="android:ellipsize">end</item>
+        <item name="android:textAppearance">?android:textAppearanceSmall</item>
+        <item name="android:textSize">@dimen/theme_target_id_size</item>
     </style>
 </resources>

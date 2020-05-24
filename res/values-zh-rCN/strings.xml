@@ -19,11 +19,10 @@
 <resources>
     <string name="app_name">主题</string>
 
-    <string name="skin_picker_button_apply">应用主题</string>
-
     <string name="separator_sound">声音</string>
     <string name="separator_background">背景</string>
     <string name="separator_app">应用程序</string>
+    <string name="separator_others">其他</string>
     <string name="separator_preview">预览</string>
 
     <string name="background_wallpaper">壁纸</string>
@@ -33,6 +32,9 @@
     <string name="sound_alarm">闹钟铃声</string>
     <string name="sound_notification">通知提示音</string>
 
+    <string name="others_bootanimation">开机动画</string>
+    <string name="others_fonts">字体</string>
+
     <string name="channel_apply_status">应用状态</string>
     <string name="skin_apply_status_running">正在应用主题</string>
     <string name="skin_apply_status_ringtone">正在应用铃声</string>
@@ -40,21 +42,26 @@
     <string name="skin_apply_status_notification">正在应用通知提示音</string>
     <string name="skin_apply_status_wallpaper">正在应用壁纸</string>
     <string name="skin_apply_status_lockscreen">正在应用锁屏壁纸</string>
+    <string name="skin_apply_status_bootanimation">正在应用开机动画</string>
+    <string name="skin_apply_status_fonts">正在应用字体</string>
+    <string name="skin_apply_status_installing_overlay">正在安装叠加层</string>
     <string name="skin_apply_status_overlay">正在应用到 %1$s</string>
+    <string name="skin_apply_status_cleaning">清理中</string>
     <string name="skin_apply_status_succeed">%1$s 应用成功</string>
     <string name="skin_apply_status_failed">%1$s 应用失败</string>
 
     <string name="dialog_remove_package_title">卸载主题</string>
     <string name="dialog_remove_package_text">卸载 %1$s ？</string>
-    <string name="menu_refresh">刷新</string>
-    <string name="menu_preferences">首选项</string>
+    <string name="uninstall_theme_succeed">主题已卸载</string>
+    <string name="uninstall_theme_failed">主题卸载失败. 错误代码:%1$s</string>
+
+    <string name="preview_menu_apply">应用</string>
+    <string name="picker_menu_refresh">刷新</string>
+    <string name="picker_menu_preferences">首选项</string>
+
+    <string name="preferences_title">首选项</string>
+    <string name="preferences_backgrounds_header">背景</string>
+    <string name="preferences_applications_header">应用程序</string>
     <string name="preferences_overlay_uninstall_flag">停用叠加层后将其卸载</string>
-    <string name="skin_apply_status_installing_overlay">正在安装叠加层</string>
-    <string name="skin_apply_status_cleaning">清理中</string>
-    <string name="separator_others">其他</string>
-    <string name="others_bootanimation">开机动画</string>
-    <string name="others_fonts">字体</string>
-    <string name="skin_apply_status_bootanimation">正在应用开机动画</string>
-    <string name="skin_apply_status_fonts">正在应用字体</string>
     <string name="preferences_forced_center_wallpaper">强制居中壁纸</string>
 </resources>

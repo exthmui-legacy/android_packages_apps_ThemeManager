@@ -32,7 +32,7 @@ public class ThemeItem extends ThemeBase {
     public boolean hasBootanimation = false;
     public boolean hasFonts = false;
 
-    private List<OverlayTarget> mOverlayTargets;
+    private List<ThemeTarget> mOverlayTargets;
 
     public ThemeItem(String packageName) {
         super(packageName);
@@ -47,7 +47,7 @@ public class ThemeItem extends ThemeBase {
         mRingtone = in.readString();
         hasBootanimation = in.readBoolean();
         hasFonts = in.readBoolean();
-        mOverlayTargets = in.readParcelableList(new ArrayList<>(), OverlayTarget.class.getClassLoader());
+        mOverlayTargets = in.readParcelableList(new ArrayList<>(), ThemeTarget.class.getClassLoader());
     }
 
     public static final Creator<ThemeBase> CREATOR = new Creator<ThemeBase>() {
@@ -82,11 +82,11 @@ public class ThemeItem extends ThemeBase {
         mWallpaper = wallpaper;
     }
 
-    public void setOverlayTargets(List<OverlayTarget> overlayTargets) {
+    public void setOverlayTargets(List<ThemeTarget> overlayTargets) {
         mOverlayTargets = overlayTargets;
     }
 
-    public List<OverlayTarget> getOverlayTargets() {
+    public List<ThemeTarget> getOverlayTargets() {
         return mOverlayTargets;
     }
 

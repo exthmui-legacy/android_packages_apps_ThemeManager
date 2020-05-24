@@ -50,6 +50,8 @@ public class Constants {
     public final static String THEME_DATA_ASSETS_FONTS = "fonts";
     public final static String THEME_DATA_ASSETS_MEDIA = "media";
     public final static String THEME_DATA_ASSETS_OVERLAY = "overlay";
+
+    // Theme xml
     public final static String THEME_DATA_XML_FILE = "theme_data";
     public final static String THEME_DATA_XML_OVERLAY = "overlay";
     public final static String THEME_DATA_XML_OVERLAY_TARGET = "target";
@@ -80,13 +82,13 @@ public class Constants {
     public final static String THEME_CLEANING = "CLEANING";
 
     // Theme target key
-    public final static String THEME_TARGET_WALLPAPER = "theme.wallpaper";
-    public final static String THEME_TARGET_LOCKSCREEN = "theme.lockscreen";
-    public final static String THEME_TARGET_ALARM = "theme.alarm";
-    public final static String THEME_TARGET_NOTIFICATION = "theme.notification";
-    public final static String THEME_TARGET_RINGTONE = "theme.ringtone";
-    public final static String THEME_TARGET_BOOTANIMATION = "theme.bootanimation";
-    public final static String THEME_TARGET_FONTS = "theme.fonts";
+    public final static String THEME_TARGET_WALLPAPER = "theme.target.wallpaper";
+    public final static String THEME_TARGET_LOCKSCREEN = "theme.target.lockscreen";
+    public final static String THEME_TARGET_ALARM = "theme.target.alarm";
+    public final static String THEME_TARGET_NOTIFICATION = "theme.target.notification";
+    public final static String THEME_TARGET_RINGTONE = "theme.target.ringtone";
+    public final static String THEME_TARGET_BOOTANIMATION = "theme.target.bootanimation";
+    public final static String THEME_TARGET_FONTS = "theme.target.fonts";
 
     // Preferences key
     public final static String PREFERENCES_OVERLAY_REMOVE_FLAG = "overlay_uninstall_flag";

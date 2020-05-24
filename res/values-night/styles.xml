@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="theme_target">
+        <item name="cardBackground">#333333</item>
+        <item name="nameTextColor">#ffffff</item>
+        <item name="idTextColor">#E0E0E0</item>
+        <item name="iconColor">#ffffff</item>
+    </style>
+    <style name="theme_target_disabled">
+        <item name="cardBackground">#555555</item>
+        <item name="nameTextColor">#ffffff</item>
+        <item name="idTextColor">#E0E0E0</item>
+        <item name="iconColor">#dedede</item>
+    </style>
+    <style name="theme_target_selected">
+        <item name="cardBackground">#2979ff</item>
+        <item name="nameTextColor">#ffffff</item>
+        <item name="idTextColor">#E0E0E0</item>
+        <item name="iconColor">#ffffff</item>
+    </style>
+
+</resources>

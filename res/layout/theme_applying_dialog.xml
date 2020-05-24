@@ -6,36 +6,29 @@
     android:layout_height="wrap_content"
     android:orientation="vertical">
 
-    <TextView
-        android:id="@+id/applying_text"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="@dimen/applying_layout_margin_bottom" />
-
-    <ProgressBar
-        android:id="@+id/applying_prog"
-        style="@android:style/Widget.DeviceDefault.ProgressBar.Horizontal"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="@dimen/applying_layout_margin_bottom"
-        android:visibility="gone" />
-
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="horizontal">
+        style="@style/skin_applying_dialog"
+        android:orientation="vertical">
 
-        <Space
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1" />
-
-        <Button
-            android:id="@+id/dismiss_button"
-            style="@style/skin_applying_dialog_button"
+        <TextView
+            android:id="@+id/applying_text"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:visibility="gone" />
+            android:layout_height="wrap_content" />
+
+        <ProgressBar
+            android:id="@+id/applying_prog"
+            style="@android:style/Widget.DeviceDefault.ProgressBar.Horizontal"
+            android:layout_marginTop="6dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
     </LinearLayout>
 
+    <Button
+        android:id="@+id/dismiss_button"
+        style="@style/skin_applying_dialog_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end"/>
 </LinearLayout>

@@ -20,28 +20,40 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
-import android.content.SharedPreferences;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.UserHandle;
-import android.preference.PreferenceManager;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
+import android.widget.ImageView;
+import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentActivity;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.appbar.AppBarLayout;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+
+import org.exthmui.theme.adapters.PreviewImageAdapter;
+import org.exthmui.theme.adapters.ThemeTargetAdapter;
 import org.exthmui.theme.fragments.ThemeApplyingDialog;
-import org.exthmui.theme.fragments.ThemePreviewFragment;
-import org.exthmui.theme.interfaces.ThemePreviewInterface;
 import org.exthmui.theme.misc.Constants;
 import org.exthmui.theme.models.ThemeItem;
+import org.exthmui.theme.models.ThemeTarget;
 import org.exthmui.theme.services.ThemeDataService;
 import org.exthmui.theme.services.ThemeManageService;
 
-import java.util.List;
+import java.util.ArrayList;
 
-public class ThemePreviewActivity extends FragmentActivity implements ThemePreviewInterface {
+public class ThemePreviewActivity extends AppCompatActivity {
 
     private static final String TAG = "ThemePreviewActivity";
 
@@ -52,11 +64,24 @@ public class ThemePreviewActivity extends FragmentActivity implements ThemePrevi
     private ThemeManageService.ThemeApplyStatusListener mThemeApplyStatusListener;
 
     private String mThemePackageName;
-    private ThemePreviewFragment mFragment;
     private ThemeApplyingDialog mApplyingDialog;
     private ThemeItem mThemeItem;
+    private Bundle themeTargetBundle;
 
-    private SharedPreferences mPreferences;
+    private ThemeTargetAdapter mThemeTargetAdapter;
+    private ArrayList<ThemeTarget> mThemeTargets;
+    private PreviewImageAdapter mPreviewImageAdapter;
+    private ArrayList<Drawable> mPreviewImages;
+
+    private TextView tvTitle;
+    private TextView tvAuthor;
+    private TextView tvSeparatorPreview;
+    private ImageView imageBanner;
+    private ImageView imagePreview;
+    private RecyclerView targetsView;
+    private RecyclerView previewsView;
+    private FloatingActionButton btnApply;
+    private Menu actionMenu;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,14 +91,64 @@ public class ThemePreviewActivity extends FragmentActivity implements ThemePrevi
         Intent intent = getIntent();
         mThemePackageName = intent.getStringExtra("theme");
 
-        if (savedInstanceState == null) {
-            getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.container, ThemePreviewFragment.newInstance())
-                    .commitNow();
-            mApplyingDialog = new ThemeApplyingDialog();
+        tvTitle = findViewById(R.id.theme_title);
+        tvAuthor = findViewById(R.id.theme_author);
+        tvSeparatorPreview = findViewById(R.id.theme_separator_preview);
+        imageBanner = findViewById(R.id.banner_image);
+        imagePreview = findViewById(R.id.preview_image_view);
+        btnApply = findViewById(R.id.apply_theme_button);
+        targetsView = findViewById(R.id.theme_target_list);
+        previewsView = findViewById(R.id.preview_images_list);
+
+        mThemeTargets = new ArrayList<>();
+        mThemeTargetAdapter = new ThemeTargetAdapter(mThemeTargets, this);
+        mThemeTargetAdapter.setOnItemClickListener((v, position) -> onThemeTargetItemClick(position));
+        targetsView.setLayoutManager(new GridLayoutManager(this, getResources().getInteger(R.integer.preview_target_span_count)));
+        targetsView.setAdapter(mThemeTargetAdapter);
+
+        mPreviewImages = new ArrayList<>();
+        mPreviewImageAdapter = new PreviewImageAdapter(mPreviewImages);
+        mPreviewImageAdapter.setOnItemClickListener((v, position) -> {
+            imagePreview.setImageDrawable(mPreviewImages.get(position));
+            imagePreview.setVisibility(View.VISIBLE);
+        });
+        previewsView.setLayoutManager(new LinearLayoutManager(this, RecyclerView.HORIZONTAL, false));
+        previewsView.setAdapter(mPreviewImageAdapter);
+        imagePreview.setOnClickListener(v -> {
+            if (getSupportActionBar() != null) {
+                getSupportActionBar().show();
+            }
+            imagePreview.setVisibility(View.GONE);
+        });
+
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        toolbar.setTitle("");
+        setSupportActionBar(toolbar);
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_back_arrow);
         }
 
-        mPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        if (savedInstanceState != null) {
+            themeTargetBundle = savedInstanceState.getBundle("target_bundle");
+        } else {
+            themeTargetBundle =  new Bundle();
+        }
+
+        btnApply.setOnClickListener(v -> applyTheme());
+
+        AppBarLayout appBarLayout = findViewById(R.id.app_bar);
+        appBarLayout.addOnOffsetChangedListener(new AppBarLayout.OnOffsetChangedListener() {
+            @Override
+            public void onOffsetChanged(AppBarLayout appBarLayout, int i) {
+                if (actionMenu == null) return;
+                if (i < -imageBanner.getHeight()) {
+                    actionMenu.findItem(R.id.action_apply).setVisible(true);
+                } else {
+                    actionMenu.findItem(R.id.action_apply).setVisible(false);
+                }
+            }
+        });
 
         Intent mThemeDataService = new Intent(this, ThemeDataService.class);
         mThemeDataConn = new ThemeDataConn();
@@ -86,11 +161,37 @@ public class ThemePreviewActivity extends FragmentActivity implements ThemePrevi
     @Override
     public void onAttachFragment(Fragment fragment) {
         super.onAttachFragment(fragment);
-        if (fragment instanceof ThemePreviewFragment) {
-            mFragment = (ThemePreviewFragment) fragment;
-        } else if (mApplyingDialog == null && fragment instanceof ThemeApplyingDialog) {
+        if (mApplyingDialog == null && fragment instanceof ThemeApplyingDialog) {
             mApplyingDialog = (ThemeApplyingDialog) fragment;
         }
+    }
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putBundle("target_bundle", themeTargetBundle);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_preview, menu);
+        actionMenu = menu;
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+
+        switch (id) {
+            case android.R.id.home:
+                finish();
+                break;
+            case R.id.action_apply:
+                applyTheme();
+                break;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
@@ -105,32 +206,137 @@ public class ThemePreviewActivity extends FragmentActivity implements ThemePrevi
             } catch (Exception e) {
                 Log.e(TAG, "Failed to remove theme apply status listener!");
             }
-
             unbindService(mThemeManageConn);
         }
+        mApplyingDialog = null;
     }
 
-    @Override
-    public List<Drawable> getThemePreviewList(String packageName) {
-        return mThemeDataBinder.getThemePreviewList(packageName);
+    private void onThemeTargetItemClick(int position) {
+        ThemeTarget target = mThemeTargets.get(position);
+        if (!target.isSwitchable() || target.isSubtitle()) return;
+        target.select(!target.isSelected());
+        themeTargetBundle.putBoolean(target.getTargetId(), target.isSelected());
+        mThemeTargetAdapter.notifyDataSetChanged();
     }
 
-    @Override
-    public Drawable getThemeBanner(String packageName) {
-        return mThemeDataBinder.getThemeBanner(packageName);
-    }
-
-    @Override
-    public void applyTheme(Bundle bundle) {
-        if (mApplyingDialog == null) mApplyingDialog = new ThemeApplyingDialog();
-        mApplyingDialog.show(getSupportFragmentManager(), TAG);
-        bundle.putBoolean(Constants.PREFERENCES_OVERLAY_REMOVE_FLAG, mPreferences.getBoolean(Constants.PREFERENCES_OVERLAY_REMOVE_FLAG, false));
-        bundle.putBoolean(Constants.PREFERENCES_FORCED_CENTER_WALLPAPER, mPreferences.getBoolean(Constants.PREFERENCES_FORCED_CENTER_WALLPAPER, false));
+    private void updateViewForTheme() {
+        tvTitle.setText(mThemeItem.getTitle());
+        tvAuthor.setText(mThemeItem.getAuthor());
+        imageBanner.setImageDrawable(mThemeDataBinder.getThemeBanner(mThemeItem.getPackageName()));
         new Thread(() -> {
-            if (mThemeItem != null) {
-                mThemeManageBinder.applyTheme(mThemeItem, bundle);
-            }
+            mPreviewImages.addAll(mThemeDataBinder.getThemePreviewList(mThemeItem.getPackageName()));
+            runOnUiThread(() -> {
+                mPreviewImageAdapter.notifyDataSetChanged();
+                if (mPreviewImages.isEmpty()) {
+                    tvSeparatorPreview.setVisibility(View.GONE);
+                }
+            });
         }).start();
+
+        // wallpaper
+        if (mThemeItem.hasWallpaper()) {
+            addThemeTarget(Constants.THEME_TARGET_WALLPAPER, ThemeTarget.TYPE_BACKGROUNDS, R.string.background_wallpaper, true);
+        }
+        if (mThemeItem.hasLockScreen()) {
+            addThemeTarget(Constants.THEME_TARGET_LOCKSCREEN, ThemeTarget.TYPE_BACKGROUNDS, R.string.background_lockscreen, true);
+        }
+        if (mThemeItem.hasWallpaper() || mThemeItem.hasLockScreen()) {
+            addSubtitle(ThemeTarget.TYPE_BACKGROUNDS, R.string.separator_background);
+        }
+
+        // sound
+        if (mThemeItem.hasRingtone()) {
+            addThemeTarget(Constants.THEME_TARGET_RINGTONE, ThemeTarget.TYPE_SOUNDS, R.string.sound_ringtone, true);
+        }
+        if (mThemeItem.hasAlarmSound()) {
+            addThemeTarget(Constants.THEME_TARGET_ALARM, ThemeTarget.TYPE_SOUNDS, R.string.sound_alarm, true);
+        }
+        if (mThemeItem.hasNotificationSound()) {
+            addThemeTarget(Constants.THEME_TARGET_NOTIFICATION, ThemeTarget.TYPE_SOUNDS, R.string.sound_notification, true);
+        }
+        if (mThemeItem.hasRingtone() || mThemeItem.hasAlarmSound() || mThemeItem.hasNotificationSound()) {
+            addSubtitle(ThemeTarget.TYPE_SOUNDS, R.string.separator_sound);
+        }
+
+        // others
+        if (mThemeItem.hasBootanimation) {
+            addThemeTarget(Constants.THEME_TARGET_BOOTANIMATION, ThemeTarget.TYPE_OTHERS, R.string.others_bootanimation, true);
+        }
+        if (mThemeItem.hasFonts) {
+            addThemeTarget(Constants.THEME_TARGET_FONTS, ThemeTarget.TYPE_OTHERS,  R.string.others_fonts, true);
+        }
+        if (mThemeItem.hasBootanimation || mThemeItem.hasFonts) {
+            addSubtitle(ThemeTarget.TYPE_OTHERS, R.string.separator_others);
+        }
+
+        // apps
+        if (mThemeItem.hasOverlays()) {
+            int startPos = mThemeTargets.size() - 1;
+            mThemeTargets.addAll(mThemeItem.getOverlayTargets());
+            for (int i = startPos; i < mThemeTargets.size(); i++) {
+                ThemeTarget target = mThemeTargets.get(i);
+                target.select(themeTargetBundle.getBoolean(target.getTargetId(), true));
+            }
+            addSubtitle(ThemeTarget.TYPE_APPLICATIONS, R.string.separator_app);
+        }
+
+        mThemeTargets.sort(ThemeTarget::compareTo);
+        mThemeTargetAdapter.notifyDataSetChanged();
+
+        // previews
+        /*List<Drawable> previewList = mThemeDataBinder.getThemePreviewList(mThemeItem.getPackageName());
+        if (!previewList.isEmpty()) {
+            for (Drawable drawable : previewList) {
+                addPreview(drawable);
+            }
+        } else {
+            previewLayout.setVisibility(View.GONE);
+        }*/
+
+    }
+
+    private void addThemeTarget(final String id, int type, int textId, boolean enabled) {
+        ThemeTarget target = new ThemeTarget(id, type);
+        target.setLabel(getString(textId));
+        target.setSwitchable(enabled);
+        target.select(themeTargetBundle.getBoolean(id, true));
+        target.setIsSubtitle(false);
+        mThemeTargets.add(target);
+    }
+
+    private void addSubtitle(int type, int stringRes) {
+        ThemeTarget subtitleTarget = new ThemeTarget("target.subtitle", type);
+        subtitleTarget.setLabel(getString(stringRes));
+        subtitleTarget.setIsSubtitle(true);
+        mThemeTargets.add(subtitleTarget);
+    }
+
+/*
+    private void addPreview(Drawable drawable) {
+
+        int imageHeight = getResources().getDimensionPixelOffset(R.dimen.preview_image_height);
+
+        ImageView imageView = new ImageView(this);
+        imageView.setImageDrawable(drawable);
+
+        imageView.setMaxHeight(imageHeight);
+        imageView.setAdjustViewBounds(true);
+
+        imageView.setOnClickListener(v -> {
+            imagePreviewViewer.setImageDrawable(imageView.getDrawable());
+            imagePreviewViewer.setVisibility(View.VISIBLE);
+        });
+
+        previewPicLayout.addView(imageView);
+
+    }
+*/
+    public void applyTheme() {
+        if (mApplyingDialog == null) mApplyingDialog = new ThemeApplyingDialog();
+        if (mThemeItem != null) {
+            mApplyingDialog.show(getSupportFragmentManager(), TAG);
+            mThemeManageBinder.applyTheme(mThemeItem, themeTargetBundle);
+        }
     }
 
     private class ThemeDataConn implements ServiceConnection {
@@ -139,7 +345,9 @@ public class ThemePreviewActivity extends FragmentActivity implements ThemePrevi
             mThemeDataBinder = (ThemeDataService.ThemeDataBinder) iBinder;
             if (mThemeDataBinder.isThemePackage(mThemePackageName)) {
                 mThemeItem = mThemeDataBinder.getThemeItem(mThemePackageName);
-                mFragment.setThemeItem(mThemeItem);
+                updateViewForTheme();
+            } else {
+                finish();
             }
         }
 
@@ -153,7 +361,7 @@ public class ThemePreviewActivity extends FragmentActivity implements ThemePrevi
         public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
             mThemeManageBinder = (ThemeManageService.ThemeManageBinder) iBinder;
             mThemeApplyStatusListener = data -> {
-                if (mFragment == null || mApplyingDialog == null) return false;
+                if (mApplyingDialog == null) return false;
                 sendBroadcastAsUser(data, UserHandle.CURRENT_OR_SELF);
                 runOnUiThread(() -> mApplyingDialog.updateData(data));
                 return true;

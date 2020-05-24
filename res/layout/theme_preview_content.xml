@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    tools:showIn="@layout/theme_preview_activity">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/theme_target_list"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:clipToPadding="false"
+                    android:paddingStart="@dimen/preview_grid_padding_start"
+                    android:paddingTop="@dimen/preview_grid_padding_top"
+                    android:paddingEnd="@dimen/preview_grid_padding_end"
+                    android:paddingBottom="@dimen/preview_grid_padding_bottom" />
+
+                <TextView
+                    android:id="@+id/theme_separator_preview"
+                    style="@style/sub_header"
+                    android:layout_marginStart="16.0dp"
+                    android:layout_marginEnd="16.0dp"
+                    android:text="@string/separator_preview" />
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/preview_images_list"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:clipToPadding="false"
+                    android:paddingStart="@dimen/preview_grid_padding_start"
+                    android:paddingTop="@dimen/preview_grid_padding_top"
+                    android:paddingEnd="@dimen/preview_grid_padding_end"
+                    android:paddingBottom="@dimen/preview_grid_padding_bottom" />
+        </LinearLayout>
+</androidx.core.widget.NestedScrollView>

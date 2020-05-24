@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="themeTarget">
+        <attr name="cardBackground" format="color" />
+        <attr name="nameTextColor" format="color" />
+        <attr name="idTextColor" format="color" />
+        <attr name="iconColor" format="color" />
+    </declare-styleable>
+</resources>

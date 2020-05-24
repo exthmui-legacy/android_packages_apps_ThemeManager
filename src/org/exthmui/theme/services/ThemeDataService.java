@@ -32,10 +32,10 @@ import android.util.DisplayMetrics;
 import android.util.Log;
 
 import org.exthmui.theme.misc.Constants;
-import org.exthmui.theme.models.OverlayTarget;
 import org.exthmui.theme.models.ThemeBase;
 import org.exthmui.theme.models.ThemeItem;
 
+import org.exthmui.theme.models.ThemeTarget;
 import org.xmlpull.v1.XmlPullParserException;
 
 import java.io.IOException;
@@ -162,15 +162,15 @@ public class ThemeDataService extends Service {
         return previewList;
     }
 
-    private OverlayTarget getOverlayTarget(String packageName) {
+    private ThemeTarget getOverlayTarget(String packageName) {
         try {
             ApplicationInfo ai = mPackageManager.getApplicationInfo(packageName, 0);
 
-            OverlayTarget overlayTarget = new OverlayTarget(packageName);
+            ThemeTarget overlayTarget = new ThemeTarget(packageName, ThemeTarget.TYPE_APPLICATIONS);
             overlayTarget.setLabel(ai.loadLabel(mPackageManager).toString());
             return overlayTarget;
-        } catch (Exception e) {
-            Log.e(TAG, "Failed to get info of " + packageName);
+        } catch (PackageManager.NameNotFoundException e) {
+            Log.e(TAG, "Failed to get info of " + packageName + ": package not found");
         }
         return null;
     }
@@ -201,7 +201,7 @@ public class ThemeDataService extends Service {
             int hasFontsResId = resources.getIdentifier(Constants.THEME_DATA_HAS_FONTS, "bool", packageName);
             theme.hasFonts = (hasFontsResId != 0) && resources.getBoolean(hasFontsResId);
 
-            List<OverlayTarget> overlayTargetList = new ArrayList<>();
+            List<ThemeTarget> overlayTargetList = new ArrayList<>();
             int themeInfoXmlResId = resources.getIdentifier(Constants.THEME_DATA_XML_FILE, "xml", packageName);
             XmlResourceParser themeInfoXml = resources.getXml(themeInfoXmlResId);
             int eventType = themeInfoXml.getEventType();
@@ -231,7 +231,7 @@ public class ThemeDataService extends Service {
         }
     }
 
-    private void overlayParser(XmlResourceParser xml, List<OverlayTarget> list) throws XmlPullParserException, IOException {
+    private void overlayParser(XmlResourceParser xml, List<ThemeTarget> list) throws XmlPullParserException, IOException {
         int eventType = xml.next();
         int tagNum = 0;
         String tagName = null;
@@ -253,7 +253,7 @@ public class ThemeDataService extends Service {
                     break;
                 case XmlResourceParser.TEXT:
                     if (Constants.THEME_DATA_XML_OVERLAY_TARGET.equals(tagName)) {
-                        OverlayTarget overlayTarget = getOverlayTarget(xml.getText());
+                        ThemeTarget overlayTarget = getOverlayTarget(xml.getText());
                         if (overlayTarget == null) continue;
                         overlayTarget.setSwitchable(overlaySwitchable);
                         list.add(overlayTarget);

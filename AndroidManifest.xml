@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
-
 <!--
     Copyright (C) 2019-2020 The exTHmUI Open Source Project
 
@@ -47,24 +46,30 @@
         <service
             android:name=".services.ThemeManageService"
             android:enabled="true"
-            android:exported="false"/>
+            android:exported="false" />
         <service
             android:name=".services.ThemeDataService"
             android:enabled="true"
-            android:exported="false"/>
+            android:exported="false" />
 
-        <activity android:name=".ThemePreviewActivity"
+        <activity
+            android:name=".ThemePreviewActivity"
             android:launchMode="singleTask"
-            android:theme="@android:style/Theme.DeviceDefault.Light.NoActionBar"/>
-        <activity android:name=".ThemePickerActivity"
+            android:label=""
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".ThemePickerActivity"
             android:launchMode="singleTask"
-            android:theme="@android:style/Theme.DeviceDefault.Light">
+            android:theme="@style/AppTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name=".SettingsActivity"
+            android:label="@string/preferences_title"
+            android:theme="@style/AppTheme" />
     </application>
 
 </manifest>
