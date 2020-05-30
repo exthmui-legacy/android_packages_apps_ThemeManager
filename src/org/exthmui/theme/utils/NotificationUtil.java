@@ -37,7 +37,9 @@ public class NotificationUtil {
     public static void createNotificationChannel(Context context, String channelId, String channelName, int importance) {
         NotificationChannel channel = new NotificationChannel(channelId, channelName, importance);
         NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-        notificationManager.createNotificationChannel(channel);
+        if (notificationManager != null) {
+            notificationManager.createNotificationChannel(channel);
+        }
     }
 
     public static void showNotification(Context context, PendingIntent pendingIntent, String channelId, int id, String title, String message, int icon) {
@@ -47,12 +49,16 @@ public class NotificationUtil {
     public static void showNotification(Context context, PendingIntent pendingIntent, String channelId, int id, String title, String message, int icon, int max, int progress, boolean indeterminate) {
         NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         Notification notification = buildNotification(context, pendingIntent, channelId, title, message, icon, max, progress, indeterminate);
-        notificationManager.notify(id, notification);
+        if (notificationManager != null) {
+            notificationManager.notify(id, notification);
+        }
     }
 
     public static void destroyNotification(Context context, int id) {
         NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-        notificationManager.cancel(id);
+        if (notificationManager != null) {
+            notificationManager.cancel(id);
+        }
     }
 
     public static Notification buildNotification(Context context, PendingIntent pendingIntent, String channelId, String title, String message, int icon, int max, int progress, boolean indeterminate) {

@@ -282,17 +282,6 @@ public class ThemePreviewActivity extends AppCompatActivity {
 
         mThemeTargets.sort(ThemeTarget::compareTo);
         mThemeTargetAdapter.notifyDataSetChanged();
-
-        // previews
-        /*List<Drawable> previewList = mThemeDataBinder.getThemePreviewList(mThemeItem.getPackageName());
-        if (!previewList.isEmpty()) {
-            for (Drawable drawable : previewList) {
-                addPreview(drawable);
-            }
-        } else {
-            previewLayout.setVisibility(View.GONE);
-        }*/
-
     }
 
     private void addThemeTarget(final String id, int type, int textId, boolean enabled) {
@@ -311,26 +300,6 @@ public class ThemePreviewActivity extends AppCompatActivity {
         mThemeTargets.add(subtitleTarget);
     }
 
-/*
-    private void addPreview(Drawable drawable) {
-
-        int imageHeight = getResources().getDimensionPixelOffset(R.dimen.preview_image_height);
-
-        ImageView imageView = new ImageView(this);
-        imageView.setImageDrawable(drawable);
-
-        imageView.setMaxHeight(imageHeight);
-        imageView.setAdjustViewBounds(true);
-
-        imageView.setOnClickListener(v -> {
-            imagePreviewViewer.setImageDrawable(imageView.getDrawable());
-            imagePreviewViewer.setVisibility(View.VISIBLE);
-        });
-
-        previewPicLayout.addView(imageView);
-
-    }
-*/
     public void applyTheme() {
         if (mApplyingDialog == null) mApplyingDialog = new ThemeApplyingDialog();
         if (mThemeItem != null) {

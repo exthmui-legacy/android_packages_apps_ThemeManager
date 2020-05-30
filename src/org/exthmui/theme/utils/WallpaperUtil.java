@@ -23,8 +23,6 @@ import android.graphics.Rect;
 import android.util.DisplayMetrics;
 import android.util.Log;
 
-import java.io.InputStream;
-
 public class WallpaperUtil {
 
     private static final String TAG = "WallpaperUtil";

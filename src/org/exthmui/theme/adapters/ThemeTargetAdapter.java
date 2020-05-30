@@ -28,6 +28,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -51,8 +52,9 @@ public class ThemeTargetAdapter extends AdapterBase<RecyclerView.ViewHolder> {
         mContext = context;
     }
 
+    @NonNull
     @Override
-    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
+    public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int viewType) {
         if (viewType == VIEW_TYPE_TITLE) {
             View view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.theme_subtitle, viewGroup, false);
             return new SubtitleViewHolder(view);

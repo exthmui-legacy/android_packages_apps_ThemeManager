@@ -33,10 +33,12 @@ public class ThemeStatusReceiver extends BroadcastReceiver {
         String msg;
         int max = 0, progress = 0;
         boolean indeterminate = false;
-        int notificationId = intent.getStringExtra("themePackage").hashCode();
+        String packageName = intent.getStringExtra("themePackage");
         String themeTitle = intent.getStringExtra("themeTitle");
-
-        switch (intent.getStringExtra("status")) {
+        String status = intent.getStringExtra("status");
+        if (packageName == null || status == null) return;
+        int notificationId = packageName.hashCode();
+        switch (status) {
             case Constants.THEME_APPLYING:
                 msg = context.getString(R.string.skin_apply_status_running);
                 indeterminate = true;

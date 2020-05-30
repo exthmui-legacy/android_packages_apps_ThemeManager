@@ -16,8 +16,6 @@
 
 package org.exthmui.theme.misc;
 
-import android.os.Environment;
-
 public class Constants {
 
     // Broadcast

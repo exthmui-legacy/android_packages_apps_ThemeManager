@@ -49,7 +49,7 @@ public class FileUtil {
     public static void createPath(File file) {
         File parent = file.getParentFile();
 
-        if (!parent.exists()) {
+        if (parent != null && !parent.exists()) {
             parent.mkdirs();
         }
     }
