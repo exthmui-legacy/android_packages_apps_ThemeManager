@@ -188,6 +188,8 @@ public class ThemePickerActivity extends AppCompatActivity {
 
         @Override
         public void onServiceDisconnected(ComponentName name) {
+            mThemeDataBinder = null;
+            mThemeBaseAdapter.setThemeDataBinder(null);
         }
     }
 

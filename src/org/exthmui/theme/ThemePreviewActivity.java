@@ -353,6 +353,7 @@ public class ThemePreviewActivity extends AppCompatActivity {
 
         @Override
         public void onServiceDisconnected(ComponentName name) {
+            mThemeDataBinder = null;
         }
     }
 
@@ -371,6 +372,8 @@ public class ThemePreviewActivity extends AppCompatActivity {
 
         @Override
         public void onServiceDisconnected(ComponentName name) {
+            mThemeManageBinder = null;
+            finish();
         }
     }
 }
