@@ -91,12 +91,7 @@ public class SoundUtil {
         new File(oldRingtoneFile).delete();
 
         Uri uri = context.getContentResolver().insert(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, values);
-        if (type == TYPE_RINGTONE) {
-            RingtoneManager.setActualDefaultRingtoneUriBySlot(context, type, uri, 1);
-            RingtoneManager.setActualDefaultRingtoneUriBySlot(context, type, uri, 2);
-        } else {
-            RingtoneManager.setActualDefaultRingtoneUri(context, type, uri);
-        }
+        RingtoneManager.setActualDefaultRingtoneUri(context, type, uri);
 
         preferences.edit().putString("applied_title_" + typeString, title).apply();
         preferences.edit().putString("applied_file_" + typeString, mediaFile.getAbsolutePath()).apply();
