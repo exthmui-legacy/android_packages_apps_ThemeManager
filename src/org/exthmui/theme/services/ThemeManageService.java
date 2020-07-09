@@ -105,7 +105,7 @@ public class ThemeManageService extends Service {
 
     public interface ThemeApplyStatusListener {
         // returns true when data is successfully processed
-        boolean update(Intent data);
+        void update(Intent data);
     }
 
     private boolean IApplyTheme(ThemeItem theme, Bundle bundle) {
@@ -387,12 +387,12 @@ public class ThemeManageService extends Service {
 
     private void notifyThemeApplyStatus() {
         while (!mApplyStatusQueue.isEmpty() && !mApplyStatusListenerList.isEmpty()) {
-            boolean popFlag = false;
             Intent data = mApplyStatusQueue.peek();
+            sendBroadcastAsUser(data, UserHandle.CURRENT_OR_SELF);
             for (ThemeApplyStatusListener listener : mApplyStatusListenerList) {
-                if (listener.update(data)) popFlag = true;
+                listener.update(data);
             }
-            if (popFlag) mApplyStatusQueue.poll();
+            mApplyStatusQueue.poll();
         }
     }
 

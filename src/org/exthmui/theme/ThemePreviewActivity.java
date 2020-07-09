@@ -331,10 +331,11 @@ public class ThemePreviewActivity extends AppCompatActivity {
         public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
             mThemeManageBinder = (ThemeManageService.ThemeManageBinder) iBinder;
             mThemeApplyStatusListener = data -> {
-                if (mApplyingDialog == null) return false;
-                sendBroadcastAsUser(data, UserHandle.CURRENT_OR_SELF);
-                runOnUiThread(() -> mApplyingDialog.updateData(data));
-                return true;
+                runOnUiThread(() -> {
+                    if (mApplyingDialog != null) {
+                        mApplyingDialog.updateData(data);
+                    }
+                });
             };
             mThemeManageBinder.addThemeApplyStatusListener(mThemeApplyStatusListener);
         }
