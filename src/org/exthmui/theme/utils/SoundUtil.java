@@ -16,12 +16,17 @@
 
 package org.exthmui.theme.utils;
 
+import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.media.RingtoneManager;
 import android.net.Uri;
+import android.os.Environment;
 import android.provider.MediaStore;
+import android.text.TextUtils;
+import android.util.Log;
 
 import androidx.preference.PreferenceManager;
 
@@ -38,23 +43,11 @@ public class SoundUtil {
     public final static int TYPE_RINGTONE = RingtoneManager.TYPE_RINGTONE;
 
     public static boolean setRingtone(Context context, String fileName, InputStream inputStream, int type) {
-
-        // create new file
-        File mediaFile = new File(context.getExternalFilesDir("sounds") + "/" + System.currentTimeMillis() + "_" + fileName);
-        FileUtil.createPath(mediaFile);
-        try {
-            FileUtil.saveInputStream(mediaFile.getAbsolutePath(), inputStream, false);
-        } catch (IOException e) {
-            e.printStackTrace();
-            return false;
-        }
-
         int extPos = fileName.indexOf(".");
         if (extPos == -1) extPos = fileName.length() - 1;
         String title = fileName.substring(0, extPos);
 
         ContentValues values = new ContentValues();
-        values.put(MediaStore.MediaColumns.DATA, mediaFile.getAbsolutePath());
         values.put(MediaStore.MediaColumns.TITLE, title);
         values.put(MediaStore.MediaColumns.MIME_TYPE, "audio/*");
         values.put(MediaStore.Audio.AudioColumns.IS_RINGTONE, false);
@@ -62,23 +55,44 @@ public class SoundUtil {
         values.put(MediaStore.Audio.AudioColumns.IS_ALARM, false);
         values.put(MediaStore.Audio.AudioColumns.IS_MUSIC, false);
 
-        String typeString = "";
+        String typeString = null;
+        File soundDir = null;
         switch (type) {
             case TYPE_ALARM:
                 typeString = "alarm";
+                soundDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_ALARMS);
                 values.put(MediaStore.Audio.AudioColumns.IS_ALARM, true);
                 break;
             case TYPE_NOTIFICATION:
                 typeString = "notification";
+                soundDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_NOTIFICATIONS);
                 values.put(MediaStore.Audio.AudioColumns.IS_NOTIFICATION, true);
                 break;
             case TYPE_RINGTONE:
                 typeString = "ringtone";
+                soundDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_RINGTONES);
                 values.put(MediaStore.Audio.AudioColumns.IS_RINGTONE, true);
                 break;
             default:
                 return false;
         }
+
+        // create new file
+        File mediaFile = new File(soundDir + "/" + fileName);
+
+        if (!soundDir.exists() && !soundDir.mkdirs()) {
+            Log.e(TAG, "Failed to create dir: " + soundDir.getAbsolutePath());
+            return false;
+        }
+
+        try {
+            FileUtil.saveInputStream(mediaFile.getAbsolutePath(), inputStream, false);
+        } catch (IOException e) {
+            Log.e(TAG, "Failed to save sound file", e);
+            return false;
+        }
+
+        values.put(MediaStore.MediaColumns.DATA, mediaFile.getAbsolutePath());
 
         // remove old ringtone
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
@@ -88,7 +102,9 @@ public class SoundUtil {
                 MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
                 MediaStore.MediaColumns.TITLE + " = ?",
                 new String[] {oldRingtoneTitle});
-        new File(oldRingtoneFile).delete();
+        if (!TextUtils.equals(oldRingtoneFile, mediaFile.getAbsolutePath())) {
+            new File(oldRingtoneFile).delete();
+        }
 
         Uri uri = context.getContentResolver().insert(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, values);
         RingtoneManager.setActualDefaultRingtoneUri(context, type, uri);
