@@ -17,6 +17,7 @@
 package org.exthmui.theme.adapters;
 
 import android.view.View;
+
 import androidx.recyclerview.widget.RecyclerView;
 
 public abstract class AdapterBase<TH extends RecyclerView.ViewHolder> extends RecyclerView.Adapter<TH> {

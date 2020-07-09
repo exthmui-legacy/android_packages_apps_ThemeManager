@@ -34,7 +34,6 @@ import android.util.Log;
 import org.exthmui.theme.misc.Constants;
 import org.exthmui.theme.models.ThemeBase;
 import org.exthmui.theme.models.ThemeItem;
-
 import org.exthmui.theme.models.ThemeTarget;
 import org.xmlpull.v1.XmlPullParserException;
 
