@@ -127,10 +127,10 @@ public class ThemePickerActivity extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
-        super.onDestroy();
         if (mThemeDataConn != null) {
             unbindService(mThemeDataConn);
         }
+        super.onDestroy();
     }
 
     public void updateThemeList() {

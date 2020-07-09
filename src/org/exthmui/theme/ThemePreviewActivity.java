@@ -196,7 +196,6 @@ public class ThemePreviewActivity extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
-        super.onDestroy();
         if (mThemeDataConn != null) {
             unbindService(mThemeDataConn);
         }
@@ -209,6 +208,7 @@ public class ThemePreviewActivity extends AppCompatActivity {
             unbindService(mThemeManageConn);
         }
         mApplyingDialog = null;
+        super.onDestroy();
     }
 
     private void onThemeTargetItemClick(int position) {
