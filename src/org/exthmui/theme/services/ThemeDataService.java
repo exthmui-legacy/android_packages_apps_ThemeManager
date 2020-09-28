@@ -270,23 +270,34 @@ public class ThemeDataService extends Service {
         int eventType = xml.next();
         String tagName = null;
         int tagNum = 0;
+        String title = null;
         while (eventType != XmlResourceParser.END_TAG || tagNum > 0) {
             switch (eventType) {
                 case XmlResourceParser.START_TAG:
                     tagName = xml.getName().toLowerCase();
                     tagNum++;
+                    title = null;
+                    for (int i = 0; i < xml.getAttributeCount(); i++) {
+                        if (xml.getAttributeName(i).equals(Constants.THEME_DATA_XML_SOUND_TITLE)) {
+                            title = xml.getAttributeValue(i);
+                            break;
+                        }
+                    }
                     break;
                 case XmlResourceParser.TEXT:
                     if (tagName == null) break;
                     switch (tagName) {
                         case Constants.THEME_DATA_XML_SOUND_RINGTONE:
                             theme.setRingtone(xml.getText());
+                            theme.setRingtoneTitle(title);
                             break;
                         case Constants.THEME_DATA_XML_SOUND_ALARM:
                             theme.setAlarmSound(xml.getText());
+                            theme.setAlarmTitle(title);
                             break;
                         case Constants.THEME_DATA_XML_SOUND_NOTIFICATION:
                             theme.setNotificationSound(xml.getText());
+                            theme.setNotificationTitle(title);
                             break;
                     }
                     break;

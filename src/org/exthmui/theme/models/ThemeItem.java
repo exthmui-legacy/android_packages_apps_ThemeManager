@@ -29,6 +29,9 @@ public class ThemeItem extends ThemeBase {
     private String mAlarmSound;
     private String mNotificationSound;
     private String mRingtone;
+    private String mAlarmTitle;
+    private String mRingtoneTitle;
+    private String mNotificationTitle;
     public boolean hasBootanimation = false;
     public boolean hasFonts = false;
 
@@ -42,8 +45,11 @@ public class ThemeItem extends ThemeBase {
         super(in);
         mWallpaper = in.readString();
         mLockScreen = in.readString();
+        mAlarmTitle = in.readString();
         mAlarmSound = in.readString();
+        mNotificationTitle = in.readString();
         mNotificationSound = in.readString();
+        mRingtoneTitle = in.readString();
         mRingtone = in.readString();
         hasBootanimation = in.readBoolean();
         hasFonts = in.readBoolean();
@@ -76,6 +82,18 @@ public class ThemeItem extends ThemeBase {
 
     public void setLockScreen(String lockScreen) {
         mLockScreen = lockScreen;
+    }
+
+    public void setAlarmTitle(String title) {
+        mAlarmTitle = title;
+    }
+    
+    public void setRingtoneTitle(String title) {
+        mRingtoneTitle = title;
+    }
+
+    public void setNotificationTitle(String title) {
+        mNotificationTitle = title;
     }
 
     public void setWallpaper(String wallpaper) {
@@ -134,13 +152,28 @@ public class ThemeItem extends ThemeBase {
         return mRingtone;
     }
 
+    public String getRingtoneTitle() {
+        return mRingtoneTitle;
+    }
+
+    public String getAlarmTitle() {
+        return mAlarmTitle;
+    }
+
+    public String getNotificationTitle() {
+        return mNotificationTitle;
+    }
+
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         super.writeToParcel(dest, flags);
         dest.writeString(mWallpaper);
         dest.writeString(mLockScreen);
+        dest.writeString(mAlarmTitle);
         dest.writeString(mAlarmSound);
+        dest.writeString(mNotificationTitle);
         dest.writeString(mNotificationSound);
+        dest.writeString(mRingtoneTitle);
         dest.writeString(mRingtone);
         dest.writeBoolean(hasBootanimation);
         dest.writeBoolean(hasFonts);

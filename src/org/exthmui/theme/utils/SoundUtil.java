@@ -40,10 +40,13 @@ public class SoundUtil {
     public final static int TYPE_NOTIFICATION = RingtoneManager.TYPE_NOTIFICATION;
     public final static int TYPE_RINGTONE = RingtoneManager.TYPE_RINGTONE;
 
-    public static boolean setRingtone(Context context, String fileName, InputStream inputStream, int type) {
-        int extPos = fileName.indexOf(".");
-        if (extPos == -1) extPos = fileName.length() - 1;
-        String title = fileName.substring(0, extPos);
+    public static boolean setRingtone(Context context, String fileName, String title, InputStream inputStream, int type) {
+        
+        if (TextUtils.isEmpty(title)) {
+            int extPos = fileName.indexOf(".");
+            if (extPos == -1) extPos = fileName.length() - 1;
+            title = fileName.substring(0, extPos);
+        }
 
         ContentValues values = new ContentValues();
         values.put(MediaStore.MediaColumns.TITLE, title);

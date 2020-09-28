@@ -55,6 +55,7 @@ public class Constants {
     public final static String THEME_DATA_XML_OVERLAY_TARGET = "target";
     public final static String THEME_DATA_XML_OVERLAY_TARGET_ATTR_SWITCHABLE = "switchable";
     public final static String THEME_DATA_XML_SOUNDS = "sounds";
+    public final static String THEME_DATA_XML_SOUND_TITLE = "title";
     public final static String THEME_DATA_XML_SOUND_RINGTONE = "ringtone";
     public final static String THEME_DATA_XML_SOUND_ALARM = "alarm";
     public final static String THEME_DATA_XML_SOUND_NOTIFICATION = "notification";
