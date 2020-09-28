@@ -78,6 +78,16 @@ public class SoundUtil {
                 return false;
         }
 
+        // remove old ringtone
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+        String oldRingtoneTitle = preferences.getString("applied_title_" + typeString, "no_ringtone");
+        String oldRingtoneFile = preferences.getString("applied_file_" + typeString, "no_ringtone");
+        context.getContentResolver().delete(
+                MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
+                MediaStore.MediaColumns.TITLE + " = ?",
+                new String[] {oldRingtoneTitle});
+        new File(oldRingtoneFile).delete();
+
         // create new file
         File mediaFile = new File(soundDir + "/" + fileName);
 
@@ -94,18 +104,6 @@ public class SoundUtil {
         }
 
         values.put(MediaStore.MediaColumns.DATA, mediaFile.getAbsolutePath());
-
-        // remove old ringtone
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
-        String oldRingtoneTitle = preferences.getString("applied_title_" + typeString, "no_ringtone");
-        String oldRingtoneFile = preferences.getString("applied_file_" + typeString, "no_ringtone");
-        context.getContentResolver().delete(
-                MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
-                MediaStore.MediaColumns.TITLE + " = ?",
-                new String[] {oldRingtoneTitle});
-        if (!TextUtils.equals(oldRingtoneFile, mediaFile.getAbsolutePath())) {
-            new File(oldRingtoneFile).delete();
-        }
 
         Uri uri = context.getContentResolver().insert(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, values);
         RingtoneManager.setActualDefaultRingtoneUri(context, type, uri);
