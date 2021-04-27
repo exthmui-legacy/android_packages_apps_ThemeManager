@@ -105,6 +105,11 @@ public class SoundUtil {
 
         values.put(MediaStore.MediaColumns.DATA, mediaFile.getAbsolutePath());
 
+        context.getContentResolver().delete(
+                MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
+                MediaStore.MediaColumns.DATA + " = ?",
+                new String[] {mediaFile.getAbsolutePath()});
+
         Uri uri = context.getContentResolver().insert(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, values);
         RingtoneManager.setActualDefaultRingtoneUri(context, type, uri);
 
